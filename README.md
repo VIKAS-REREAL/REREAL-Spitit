@@ -33,6 +33,14 @@
 
 ---
 
+## 📸 Screenshots
+<p align="center">
+  <img src="assets/Pill-of-spitit-ss.png" width="45%" alt="Spitit Pill UI">
+  <img src="assets/Setting-of-spitit-ss.png" width="45%" alt="Spitit Settings UI">
+</p>
+
+---
+
 ## ✨ Features
 -   **Global Hotkeys**: Record anytime, anywhere with system-wide shortcuts.
 -   **Groq Whisper API**: Instant, accurate transcription powered by AI.
