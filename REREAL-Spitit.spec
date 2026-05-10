@@ -42,7 +42,7 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=["unittest", "email", "http", "xml", "html"], # Removed tkinter from excludes
+    excludes=["unittest", "http", "html"], # Removed xml and email from excludes
     noarchive=False,
 )
 pyz = PYZ(a.pure)
