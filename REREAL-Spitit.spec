@@ -42,7 +42,7 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=["tkinter", "unittest", "email", "http", "xml", "html"], # Exclude bloat
+    excludes=["unittest", "email", "http", "xml", "html"], # Removed tkinter from excludes
     noarchive=False,
 )
 pyz = PYZ(a.pure)
@@ -57,7 +57,7 @@ exe = EXE(
     name="REREAL-Spitit",
     debug=False,
     bootloader_ignore_signals=False,
-    strip=True, # Strip for smaller size
+    strip=False, # Disable strip to prevent DLL corruption
     upx=False,  # UPX often triggers antivirus
     upx_exclude=[],
     runtime_tmpdir=None,
