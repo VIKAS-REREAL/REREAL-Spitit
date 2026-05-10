@@ -37,19 +37,28 @@ jobs:
         id: vars
         shell: bash
         run: |
-          VERSION=${GITHUB_REF_NAME}
-          echo "tag=$VERSION" >> $GITHUB_OUTPUT
-          # Extract the latest entry from CHANGELOG.md (everything until the next ## header)
-          sed -n '/## \[1.0.0\]/,/## \[/p' CHANGELOG.md | sed '$d' > release_notes.md
-          # If it's a tag, we might want to dynamically find the version, 
-          # but for v1.0.0 we'll just use the tag.
+          # Get tag name (e.g., v1.0.0)
+          TAG_NAME=${GITHUB_REF_NAME}
+          # Strip 'v' prefix for version matching in CHANGELOG (e.g., 1.0.0)
+          VERSION=${TAG_NAME#v}
+          echo "tag=$TAG_NAME" >> $GITHUB_OUTPUT
+          
+          # Extract the latest entry from CHANGELOG.md for this version
+          # It looks for the section starting with [VERSION] and grabs everything until the next [ header
+          sed -n "/## \[$VERSION\]/,/## \[/p" CHANGELOG.md | sed '$d' > release_notes.md
+          
+          # Fallback if notes are empty
+          if [ ! -s release_notes.md ]; then
+            echo "Release $TAG_NAME" > release_notes.md
+          fi
 
       - name: Create Release and Upload Asset
         uses: softprops/action-gh-release@v2
         with:
           files: dist/REREAL-Spitit.exe
           body_path: release_notes.md
-          name: Release ${{ github.ref_name }}
+          name: REREAL Spitit ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
           draft: false
           prerelease: false
         env:
