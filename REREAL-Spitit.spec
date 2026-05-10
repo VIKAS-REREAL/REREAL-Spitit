@@ -5,20 +5,7 @@ from PyInstaller.utils.hooks import collect_all
 
 datas = []
 binaries = []
-hiddenimports = []
-
-# Collect dependencies for specific packages
-for pkg in ("customtkinter", "pystray"):
-    d, b, h = collect_all(pkg)
-    datas += d
-    binaries += b
-    hiddenimports += h
-
-# Bundle tray icon PNG (used at runtime by tray.py)
-datas.append(("assets/icon.png", "assets"))
-
-# Explicitly add requested hidden imports
-hiddenimports += [
+hiddenimports = [
     "groq",
     "sounddevice",
     "numpy",
@@ -31,7 +18,21 @@ hiddenimports += [
     "customtkinter",
     "httpx",
     "pydantic",
+    "pkg_resources",
+    "packaging",
+    "pyparsing",
+    "setuptools",
 ]
+
+# Collect everything from core UI and system libs to be safe
+for pkg in ("customtkinter", "pystray", "PIL", "pkg_resources", "packaging"):
+    d, b, h = collect_all(pkg)
+    datas += d
+    binaries += b
+    hiddenimports += h
+
+# Bundle tray icon PNG
+datas.append(("assets/icon.png", "assets"))
 
 a = Analysis(
     ["main.py"],
@@ -42,7 +43,7 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=["unittest", "http", "html"], # Removed xml and email from excludes
+    excludes=[], # Remove all exclusions to prevent runtime ModuleNotFoundErrors
     noarchive=False,
 )
 pyz = PYZ(a.pure)
@@ -57,11 +58,11 @@ exe = EXE(
     name="REREAL-Spitit",
     debug=False,
     bootloader_ignore_signals=False,
-    strip=False, # Disable strip to prevent DLL corruption
-    upx=False,  # UPX often triggers antivirus
+    strip=False,
+    upx=False,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=False, # Windowed mode
+    console=False, # Final build should be windowed
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
