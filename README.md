@@ -24,12 +24,17 @@
 
 ---
 
-## 🚀 Quick Start
-1.  **[Download REREAL-Spitit.exe](https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/latest/download/REREAL-Spitit.exe)**
-2.  Open the app and enter your **Groq API Key** in the settings.
-3.  Hold your hotkey, speak, and watch the text appear.
+## 📥 Download
 
-[![Download](https://img.shields.io/badge/Download-REREAL--Spitit.exe-FFD505?style=for-the-badge&logo=windows)](https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/latest/download/REREAL-Spitit.exe)
+Choose your preferred version below:
+
+### 🌟 Recommended (Stable Installer)
+Best for most users. Includes a full setup wizard and automatic updates.
+[![Download Recommended](https://img.shields.io/badge/Download-Stable_Installer_v1.1.0-FFD505?style=for-the-badge&logo=windows)](https://github.com/VIKAS-REREAL/REREAL-Spitit/raw/main/dist_installer/REREAL-Spitit-Setup-1.1.0.exe)
+
+### 🚀 Latest (Portable)
+No installation required. Run directly from the `.exe`.
+[![Download Portable](https://img.shields.io/badge/Download-Portable_v1.0.0-0078D4?style=for-the-badge&logo=windows)](https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/latest/download/REREAL-Spitit.exe)
 
 ---
 

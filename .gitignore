@@ -87,5 +87,6 @@ config.json
 REREAL Spitit/
 REREAL-Spitit/
 dist_installer/
+!dist_installer/REREAL-Spitit-Setup-1.1.0.exe
 installer/
 *.exe
