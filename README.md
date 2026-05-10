@@ -20,7 +20,7 @@
 ---
 
 ## What is Spitit?
-**REREAL - Spitit** is a high-performance voice-to-text utility designed for seamless productivity. By leveraging Groq's lightning-fast Whisper implementation, Spitit transcribes your speech instantly and pastes it directly into your active window. No more typing—just spit it out.
+**REREAL - Spitit** is a high-performance voice-to-text utility designed for seamless productivity. By leveraging Groq's lightning-fast Whisper implementation, Spitit transcribes your speech instantly and intelligently handles the output. If you're in a text field, it **pastes automatically**. If not, it **copies to your clipboard**. No more typing—just spit it out.
 
 ---
 
@@ -49,7 +49,8 @@ No installation required. Run directly from the `.exe`.
 ## ✨ Features
 -   **Global Hotkeys**: Record anytime, anywhere with system-wide shortcuts.
 -   **Groq Whisper API**: Instant, accurate transcription powered by AI.
--   **Auto-Paste**: Transcribed text is automatically injected into your current application.
+-   **Smart Auto-Paste**: Automatically injects text into your current application.
+-   **Intelligent Clipboard Fallback**: If no cursor/text field is active, the transcription is automatically saved to your clipboard.
 -   **Sleek Dark UI**: A modern, premium interface built with CustomTkinter.
 -   **System Tray Integration**: Stays out of your way in the background.
 
