@@ -30,7 +30,7 @@ Choose your preferred version below:
 
 ### 🌟 Recommended (Stable Installer)
 Best for most users. Includes a full setup wizard and automatic updates.
-[![Download Recommended](https://img.shields.io/badge/Download-Stable_Installer_v1.1.0-FFD505?style=for-the-badge&logo=windows)](https://github.com/VIKAS-REREAL/REREAL-Spitit/raw/main/dist_installer/REREAL-Spitit-Setup-1.1.0.exe)
+[![Download Recommended](https://img.shields.io/badge/Download-Stable_Installer_v1.1.0-FFD505?style=for-the-badge&logo=windows)](https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/download/v1.0.0/REREAL-Spitit-Setup-1.1.0.exe)
 
 ### 🚀 Latest (Portable)
 No installation required. Run directly from the `.exe`.
