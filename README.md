@@ -1,44 +1,108 @@
-# REREAL · Spitit
+# REREAL - Spitit
 
-**Voice to text** — Windows speech-to-text app powered by Groq Whisper.
+<p align="center">
+  <img src="assets/icon.png" width="128" height="128" alt="REREAL - Spitit Icon">
+</p>
 
-Hold `Alt + Left Shift` to dictate, and the transcribed text is pasted into whatever app you're typing in.
+<p align="center">
+  <strong>Speak. Release. Done.</strong>
+</p>
 
-## Features
+<p align="center">
+  <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/latest">
+    <img src="https://img.shields.io/github/v/release/VIKAS-REREAL/REREAL-Spitit?style=for-the-badge&color=FFD505" alt="Version">
+  </a>
+  <img src="https://img.shields.io/badge/Platform-Windows-0078D4?style=for-the-badge&logo=windows" alt="Platform">
+  <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License">
+  <img src="https://img.shields.io/badge/Built%20With-Python-3776AB?style=for-the-badge&logo=python" alt="Python">
+</p>
 
-- 🎙️ **Hold-to-talk** or **Toggle-to-talk** activation modes
-- 🌐 Multi-language support (English, Hindi, Hinglish, and 10+ more)
-- ⚡ Fast transcription via Groq Whisper API
-- 🖥️ System tray integration — runs silently in the background
-- 🎨 Premium dark-mode UI with animated status pill
+---
 
-## Download
+## What is Spitit?
+**REREAL - Spitit** is a high-performance voice-to-text utility designed for seamless productivity. By leveraging Groq's lightning-fast Whisper implementation, Spitit transcribes your speech instantly and intelligently handles the output. If you're in a text field, it **pastes automatically**. If not, it **copies to your clipboard**. No more typing—just spit it out.
 
-Grab the latest `.exe` from the [Releases](../../releases) page.
+---
 
-## Build from Source
+## 📥 Download
 
-```powershell
-# Install dependencies
-pip install -r requirements.txt
-pip install pyinstaller
+Choose your preferred version below:
 
-# Build portable exe
-.\build-release.ps1
-```
+### 🌟 Recommended (Stable Installer)
+Best for most users. Includes a full setup wizard and automatic updates.
+[![Download Recommended](https://img.shields.io/badge/Download-Stable_Installer_v1.1.0-FFD505?style=for-the-badge&logo=windows)](https://github.com/VIKAS-REREAL/REREAL-Spitit/raw/main/dist_installer/REREAL-Spitit-Setup-1.1.0.exe)
 
-The built exe will be at `dist/REREAL-Spitit.exe`.
+### 🚀 Latest (Portable)
+No installation required. Run directly from the `.exe`.
+[![Download Portable](https://img.shields.io/badge/Download-Portable_v1.0.0-0078D4?style=for-the-badge&logo=windows)](https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/latest/download/REREAL-Spitit.exe)
 
-## GitHub Actions
+---
 
-Every push to `main`/`master` automatically builds the `.exe` via GitHub Actions.  
-To create a release with the exe attached, push a version tag:
+## 📸 Screenshots
+<p align="center">
+  <img src="assets/Pill-of-spitit-ss.png" width="45%" alt="Spitit Pill UI">
+  <img src="assets/Setting-of-spitit-ss.png" width="45%" alt="Spitit Settings UI">
+</p>
+
+---
+
+## ✨ Features
+-   **Global Hotkeys**: Record anytime, anywhere with system-wide shortcuts.
+-   **Groq Whisper API**: Instant, accurate transcription powered by AI.
+-   **Smart Auto-Paste**: Automatically injects text into your current application.
+-   **Intelligent Clipboard Fallback**: If no cursor/text field is active, the transcription is automatically saved to your clipboard.
+-   **Sleek Dark UI**: A modern, premium interface built with CustomTkinter.
+-   **System Tray Integration**: Stays out of your way in the background.
+
+---
+
+## ⌨️ Hotkeys
+| Action | Hotkey |
+| :--- | :--- |
+| **Hold to Talk** | `Alt + LShift` |
+| **Toggle Recording** | `Alt + LShift + Space` |
+
+---
+
+## 🔑 Getting a Groq API Key
+1.  Visit the [Groq Console](https://console.groq.com/keys).
+2.  Create a free account or sign in.
+3.  Generate a new API Key.
+4.  Paste it into the Spitit settings window.
+
+---
+
+## 🛠️ Developer Setup
+If you want to run from source:
 
 ```bash
-git tag v1.1.0
-git push origin v1.1.0
+# Clone the repository
+git clone https://github.com/VIKAS-REREAL/REREAL-Spitit.git
+cd REREAL-Spitit
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the app
+python main.py
 ```
 
-## License
+### Build from Source
+To build the `.exe` yourself:
+```bash
+pyinstaller REREAL-Spitit.spec
+```
 
-MIT © REREAL
+---
+
+## 🤝 Contributing
+We welcome contributions! Please see our [CONTRIBUTING.md](CONTRIBUTING.md) for details on how to get started.
+
+## 📄 License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<p align="center">
+  Built under <strong>REREAL</strong> — <em>Where real meets unreal</em>
+</p>
