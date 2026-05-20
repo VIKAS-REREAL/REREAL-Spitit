@@ -2,11 +2,8 @@
 
 from __future__ import annotations
 
-import logging
 import threading
 from typing import Callable, Literal
-
-logger = logging.getLogger(__name__)
 
 import keyboard
 
@@ -92,12 +89,12 @@ class HotkeyController:
         if self._toggle_hotkey_handle is not None:
             try:
                 keyboard.remove_hotkey(self._toggle_hotkey_handle)
-            except Exception as e:
-                logger.error(f"Failed to remove toggle hotkey: {e}", exc_info=True)
+            except Exception:
+                pass
             self._toggle_hotkey_handle = None
         if self._hook is not None:
             try:
                 keyboard.unhook(self._hook)
-            except Exception as e:
-                logger.error(f"Failed to unhook keyboard events: {e}", exc_info=True)
+            except Exception:
+                pass
             self._hook = None

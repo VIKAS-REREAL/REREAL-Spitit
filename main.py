@@ -1,19 +1,10 @@
 """
-Spitit — Voice-to-text for Windows.
-
-Hotkey → Microphone → Groq Whisper → Paste into active window.
-
-Usage:
-    python -m spitit          # Run from source
-    python main.py            # Alternative entry point
-
-This module wires together the subsystems (config, hotkeys, recorder,
-transcriber, paster, tray icon, and UI windows) and runs the main loop.
+VoiceFlow — REREAL · Spitit
+Windows speech-to-text: hotkey → record → Groq Whisper → paste into focused input.
 """
 
 from __future__ import annotations
 
-import logging
 import os
 import sys
 import tempfile
@@ -21,30 +12,18 @@ import threading
 import time
 from pathlib import Path
 
-# No sys.path insertion needed since modules are in the root directory.
-
 import customtkinter as ctk
 
 import config as cfg_mod
-from config import DEFAULTS
 from hotkey import HotkeyController
 from tray import create_tray_icon, ensure_icon_png
 from ui import SettingsWindow, SplashWindow, StatusPill, apply_ctk_theme
 
-# ---------------------------------------------------------------------------
-# Constants
-# ---------------------------------------------------------------------------
 STARTUP_REG_NAME = "REREALSpitit"
 STARTUP_KEY_PATH = r"Software\Microsoft\Windows\CurrentVersion\Run"
 
-logger = logging.getLogger("spitit")
 
-
-# ---------------------------------------------------------------------------
-# Launch-on-startup helpers
-# ---------------------------------------------------------------------------
 def _startup_command() -> str:
-    """Compute the command string to re-launch this app on boot."""
     if getattr(sys, "frozen", False):
         return f'"{sys.executable}"'
     main_py = Path(__file__).resolve()
@@ -52,8 +31,7 @@ def _startup_command() -> str:
 
 
 def apply_launch_on_startup(enable: bool) -> None:
-    """Register or remove the Windows Run-key entry for auto-start."""
-    import winreg  # platform-specific; imported lazily
+    import winreg
 
     cmd = _startup_command()
     with winreg.OpenKey(
@@ -71,30 +49,14 @@ def apply_launch_on_startup(enable: bool) -> None:
                 pass
 
 
-# ---------------------------------------------------------------------------
-# Application
-# ---------------------------------------------------------------------------
 class VoiceFlowApp:
-    """Top-level orchestrator for the Spitit voice-to-text application.
-
-    Wires together:
-      - config persistence
-      - system-tray icon + context menu
-      - global hotkey listener (hold / toggle)
-      - microphone → WAV recording
-      - Groq Whisper transcription
-      - clipboard-based auto-paste
-      - CustomTkinter UI (status pill + settings window)
-    """
-
     def __init__(self) -> None:
         apply_ctk_theme()
         self._config = cfg_mod.load_config()
         apply_launch_on_startup(bool(self._config.get("launch_on_startup")))
-
         self._root = ctk.CTk()
         self._root.title("REREAL · Spitit")
-        self._root.withdraw()  # hidden main window; tray is the entry point
+        self._root.withdraw()
         self._root.protocol("WM_DELETE_WINDOW", self._ignore_close)
 
         ensure_icon_png()
@@ -112,23 +74,20 @@ class VoiceFlowApp:
         )
         self._settings.withdraw()
 
-        self._splash = SplashWindow(self._root)
+        self._splash = SplashWindow(self._root, on_open_settings=self._open_settings)
 
-        # Recording state
-        self._stop_event: "threading.Event | None" = None
-        self._rec_thread: "threading.Thread | None" = None
-        self._wav_path: "Path | None" = None
+        self._stop_event: threading.Event | None = None
+        self._rec_thread: threading.Thread | None = None
+        self._wav_path: Path | None = None
         self._busy = False
         self._lock = threading.Lock()
 
-        # Hotkey controller
         self._hotkeys = HotkeyController(
             mode_getter=lambda: cfg_mod.get_mode(self._config),
             on_start=self._on_hotkey_start,
             on_stop=self._on_hotkey_stop,
         )
 
-        # System tray (runs in its own daemon thread)
         self._tray_icon = create_tray_icon(
             on_open_settings=self._open_settings,
             on_toggle_mode=self._tray_toggle_mode,
@@ -136,15 +95,13 @@ class VoiceFlowApp:
         )
         self._tray_thread = threading.Thread(target=self._tray_icon.run, daemon=True)
         self._tray_thread.start()
-        time.sleep(0.15)  # brief pause so tray icon initializes
+        time.sleep(0.15)
 
         self._hotkeys.start()
+
         self._root.after(100, self._splash.show_centered)
 
-    # -- private helpers ---------------------------------------------------
-
     def _ignore_close(self) -> None:
-        """Ignore WM_DELETE_WINDOW — keeps the app in the tray."""
         pass
 
     def _set_window_icon(self, widget: ctk.CTk) -> None:
@@ -153,8 +110,8 @@ class VoiceFlowApp:
 
             pil = Image.open(ensure_icon_png()).convert("RGBA")
             icon_img = ImageTk.PhotoImage(pil.resize((64, 64), Image.Resampling.LANCZOS))
-            widget._spitit_icon = icon_img  # type: ignore
-            widget.iconphoto(True, icon_img)  # type: ignore
+            widget._spitit_icon = icon_img  # noqa: SLF001
+            widget.iconphoto(True, icon_img)
         except Exception:
             pass
 
@@ -162,7 +119,7 @@ class VoiceFlowApp:
         return dict(self._config)
 
     def _save_pill_position(self, x: int, y: int) -> None:
-        self._config["pill_position"] = [x, y]
+        self._config["pill_position"] = [int(x), int(y)]
         cfg_mod.save_config(self._config)
 
     def _on_settings_saved(self, new_cfg: dict) -> None:
@@ -189,10 +146,7 @@ class VoiceFlowApp:
             pass
         self._root.after(0, self._root.quit)
 
-    # -- recording pipeline ------------------------------------------------
-
     def _on_hotkey_start(self) -> None:
-        """Called by HotkeyController when the user starts holding/toggling."""
         with self._lock:
             if self._busy:
                 return
@@ -216,15 +170,12 @@ class VoiceFlowApp:
         self._root.after(0, self._pill.show_recording)
 
     def _on_hotkey_stop(self) -> None:
-        """Called when the user releases the hold keys or toggles again."""
         threading.Thread(target=self._finish_recording_pipeline, daemon=True).start()
 
     def _finish_recording_pipeline(self) -> None:
-        """Stop recording, transcribe, and paste the result."""
         stop_ev = self._stop_event
         rec_th = self._rec_thread
         wav = self._wav_path
-
         try:
             if stop_ev is not None:
                 stop_ev.set()
@@ -294,19 +245,20 @@ class VoiceFlowApp:
         with self._lock:
             self._busy = False
 
-    # -- entry point -------------------------------------------------------
-
     def run(self) -> None:
         self._root.mainloop()
 
 
-# ---------------------------------------------------------------------------
-# Entry point
-# ---------------------------------------------------------------------------
 def main() -> None:
-    logging.basicConfig(level=logging.WARNING)
     VoiceFlowApp().run()
 
 
 if __name__ == "__main__":
     main()
+
+# PyInstaller (single .exe, from project root):
+# pyinstaller --noconfirm --onefile --windowed --name "REREAL-Spitit" main.py
+#
+# If assets must live beside the exe at runtime, add either:
+#   --add-data "assets;assets"
+# or ship the generated assets\\icon.png next to the executable (tray will use it if present).

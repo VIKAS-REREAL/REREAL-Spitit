@@ -5,34 +5,28 @@ from PyInstaller.utils.hooks import collect_all
 
 datas = []
 binaries = []
-hiddenimports = [
-    "groq",
-    "sounddevice",
-    "numpy",
-    "scipy",
-    "keyboard",
-    "pyperclip",
-    "pystray",
-    "PIL",
-    "PIL._tkinter_finder",
-    "customtkinter",
-    "httpx",
-    "pydantic",
-    "pkg_resources",
-    "packaging",
-    "pyparsing",
-    "setuptools",
-]
+hiddenimports = []
 
-# Collect everything from core UI and system libs to be safe
-for pkg in ("customtkinter", "pystray", "PIL", "pkg_resources", "packaging"):
+for pkg in ("customtkinter", "pystray"):
     d, b, h = collect_all(pkg)
     datas += d
     binaries += b
     hiddenimports += h
 
-# Bundle tray icon PNG
+# Bundle tray icon PNG (used at runtime by tray.py)
 datas.append(("assets/icon.png", "assets"))
+
+hiddenimports += [
+    "PIL._tkinter_finder",
+    "sounddevice",
+    "numpy",
+    "scipy",
+    "groq",
+    "httpx",
+    "pydantic",
+    "keyboard",
+    "pyperclip",
+]
 
 a = Analysis(
     ["main.py"],
@@ -43,7 +37,7 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[], # Remove all exclusions to prevent runtime ModuleNotFoundErrors
+    excludes=[],
     noarchive=False,
 )
 pyz = PYZ(a.pure)
@@ -62,12 +56,12 @@ exe = EXE(
     upx=False,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=False, # Final build should be windowed
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    version="version_info.txt",
+    version="version.txt",
     icon="assets/icon.ico",
 )

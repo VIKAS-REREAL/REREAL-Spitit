@@ -2,12 +2,9 @@
 
 from __future__ import annotations
 
-import logging
 import threading
 import time
 from pathlib import Path
-
-logger = logging.getLogger(__name__)
 
 
 def record_to_wav(
@@ -27,7 +24,7 @@ def record_to_wav(
 
     def callback(indata, frames, t, status) -> None:
         if status:
-            logger.warning(f"Audio callback status: {status}")
+            pass
         chunks.append(indata.copy())
 
     try:
@@ -44,23 +41,19 @@ def record_to_wav(
         finally:
             stream.stop()
             stream.close()
-    except Exception as e:
-        logger.error(f"Failed to start/stop audio stream: {e}", exc_info=True)
+    except Exception:
         return False
 
     if not chunks:
-        logger.warning("No audio chunks recorded.")
         return False
 
     audio = np.concatenate(chunks, axis=0).reshape(-1)
     if audio.size < sample_rate * 0.25:
-        logger.warning("Recording too short (< 0.25s).")
         return False
 
     audio_i16 = (np.clip(audio, -1.0, 1.0) * 32767.0).astype(np.int16)
     try:
         wavfile.write(str(out_path), sample_rate, audio_i16)
-    except Exception as e:
-        logger.error(f"Failed to write WAV file: {e}", exc_info=True)
+    except Exception:
         return False
     return True
