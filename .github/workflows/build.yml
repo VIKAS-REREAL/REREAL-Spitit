@@ -38,10 +38,22 @@ jobs:
         name: REREAL-Spitit-Windows-Exe
         path: dist/REREAL-Spitit.exe
 
-    - name: Release
+    - name: Release on Version Tags
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v2
       with:
         files: dist/REREAL-Spitit.exe
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Update Latest Release (Main Branch)
+      if: github.ref == 'refs/heads/main' && !startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: latest
+        name: Latest Build
+        files: dist/REREAL-Spitit.exe
+        prerelease: true
+        draft: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
