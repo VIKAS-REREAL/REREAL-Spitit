@@ -1,16 +1,11 @@
 """
 REREAL - Spitit: Icon generator.
-Creates the app icon as 512×512 PNG and multi-resolution ICO.
-
-Icon design:
-- Rounded square background, fill #FFD505 (yellow)
-- 5 vertical bars with rounded tops (waveform)
-- Heights: [38%, 60%, 100%, 60%, 38%]
-- Bar color: #111113
+Parses the custom SVG icon at docs/icon.svg and renders it as a 512×512 PNG and a multi-resolution ICO.
 """
 
 import os
 import sys
+import re
 from pathlib import Path
 
 def get_project_root():
@@ -19,71 +14,57 @@ def get_project_root():
 
 
 def generate_icon():
-    """Generate the app icon as PNG and ICO."""
+    """Generate the app icon as PNG and ICO by parsing docs/icon.svg."""
     from PIL import Image, ImageDraw
 
+    root = get_project_root()
+    svg_path = root / "docs" / "icon.svg"
+    
+    if not svg_path.exists():
+        print(f"[Error] Custom icon SVG not found at {svg_path}")
+        return
+
+    with open(svg_path, "r") as f:
+        svg_content = f.read()
+
+    # Find all <rect ... /> elements
+    rect_matches = re.findall(r'<rect\s+([^>]+)/>', svg_content)
+    
+    # Scale from 600x600 down to 512x512
     size = 512
-    inner_pct = 0.70
-    corner_pct = 0.22
+    scale = size / 600.0
 
     img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
 
-    # Background: rounded square
-    margin = 0
-    corner_radius = int(size * corner_pct)
-    draw.rounded_rectangle(
-        [margin, margin, size - margin - 1, size - margin - 1],
-        radius=corner_radius,
-        fill="#FFD505",
-    )
+    for rect in rect_matches:
+        def get_attr(name, default="0"):
+            m = re.search(fr'{name}="([^"]+)"', rect)
+            return m.group(1) if m else default
 
-    # Inner area
-    inner_size = int(size * inner_pct)
-    inner_offset = (size - inner_size) // 2
+        x = float(get_attr("x", "0"))
+        y = float(get_attr("y", "0"))
+        w = float(get_attr("width", "600"))
+        h = float(get_attr("height", "600"))
+        rx = float(get_attr("rx", "0"))
+        fill = get_attr("fill", "black")
 
-    # Bar configuration
-    bar_heights_pct = [0.38, 0.60, 1.0, 0.60, 0.38]
-    num_bars = 5
-    bar_width_pct = 0.09
-    gap_pct = 0.06
+        x1 = x * scale
+        y1 = y * scale
+        x2 = (x + w) * scale
+        y2 = (y + h) * scale
+        r = rx * scale
 
-    bar_w = int(inner_size * bar_width_pct)
-    gap = int(inner_size * gap_pct)
-    max_height = inner_size
-    bar_color = "#111113"
+        draw.rounded_rectangle([x1, y1, x2, y2], radius=r, fill=fill)
 
-    total_width = num_bars * bar_w + (num_bars - 1) * gap
-    start_x = (size - total_width) // 2
-
-    # Bottom of bars (vertically centered in inner area)
-    center_y = size // 2
-
-    for i in range(num_bars):
-        h = max(bar_w, int(max_height * bar_heights_pct[i]))
-        x1 = start_x + i * (bar_w + gap)
-        x2 = x1 + bar_w
-        y_bottom = center_y + max_height // 2
-        y_top = y_bottom - h
-
-        # Bar with rounded top and bottom
-        r = bar_w // 2
-        draw.rounded_rectangle(
-            [x1, y_top, x2, y_bottom],
-            radius=r,
-            fill=bar_color,
-        )
-
-    # Save PNG
-    root = get_project_root()
+    # Save to assets/icon.png and assets/icon.ico
     assets_dir = root / "assets"
     assets_dir.mkdir(parents=True, exist_ok=True)
 
     png_path = assets_dir / "icon.png"
     img.save(str(png_path), "PNG")
-    print(f"[OK] Saved: {png_path}")
+    print(f"[OK] Saved assets PNG: {png_path}")
 
-    # Generate ICO with multiple resolutions
     ico_sizes = [16, 32, 48, 64, 128, 256]
     ico_path = assets_dir / "icon.ico"
     img.save(
@@ -91,7 +72,26 @@ def generate_icon():
         format="ICO",
         sizes=[(s, s) for s in ico_sizes],
     )
-    print(f"[OK] Saved: {ico_path}")
+    print(f"[OK] Saved assets ICO: {ico_path}")
+
+    # Copy to assets/icon.svg
+    import shutil
+    try:
+        shutil.copy(str(svg_path), str(assets_dir / "icon.svg"))
+        print(f"[OK] Copied custom SVG to: {assets_dir / 'icon.svg'}")
+    except Exception as e:
+        print(f"[Warning] Failed to copy custom SVG to assets: {e}")
+
+    # Save copies directly to docs/icon.png and docs/icon.ico
+    docs_dir = root / "docs"
+    img.save(str(docs_dir / "icon.png"), "PNG")
+    print(f"[OK] Saved docs PNG: {docs_dir / 'icon.png'}")
+    img.save(
+        str(docs_dir / "icon.ico"),
+        format="ICO",
+        sizes=[(s, s) for s in ico_sizes],
+    )
+    print(f"[OK] Saved docs ICO: {docs_dir / 'icon.ico'}")
 
 
 if __name__ == "__main__":

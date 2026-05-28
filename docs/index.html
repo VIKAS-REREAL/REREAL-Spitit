@@ -267,6 +267,31 @@
 
         // Initialize Lucide Icons
         lucide.createIcons();
+
+        // Dynamically fetch latest release assets from GitHub API to update download buttons
+        fetch('https://api.github.com/repos/VIKAS-REREAL/REREAL-Spitit/releases/latest')
+            .then(res => res.json())
+            .then(data => {
+                const assets = data.assets;
+                const installer = assets.find(a => a.name.includes('Setup') && a.name.endsWith('.exe'));
+                const portable = assets.find(a => !a.name.includes('Setup') && a.name.endsWith('.exe'));
+                
+                if (installer) {
+                    document.querySelectorAll('a').forEach(btn => {
+                        if (btn.href.includes('Setup') || btn.textContent.includes('Installer')) {
+                            btn.href = installer.browser_download_url;
+                        }
+                    });
+                }
+                if (portable) {
+                    document.querySelectorAll('a').forEach(btn => {
+                        if (btn.href.endsWith('REREAL-Spitit.exe') || btn.textContent.includes('Portable')) {
+                            btn.href = portable.browser_download_url;
+                        }
+                    });
+                }
+            })
+            .catch(err => console.warn("Failed to fetch latest GitHub release assets, utilizing default redirect links:", err));
     </script>
 </body>
 </html>
