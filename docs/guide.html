@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="REREAL - Spitit Interactive Guide. Learn how to install, configure, and use the fastest voice-to-text for Windows.">
+    <title>REREAL - Spitit | Interactive Guide & Developer Manual</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="icon.ico">
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Animated background orbs -->
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- Header & Back Button -->
+    <header class="guide-hero">
+        <div class="container">
+            <a href="index.html" class="btn-back">
+                <i data-lucide="arrow-left"></i> Back to Home
+            </a>
+            <h1 class="hero-title">
+                Interactive <span class="brand-real">Guide</span>
+            </h1>
+            <p class="hero-tagline">Learn how to Speak. Release. Done.</p>
+        </div>
+    </header>
+
+    <!-- Main Content Grid -->
+    <section class="guide-body" style="padding-bottom: 100px;">
+        <div class="container">
+            <div class="guide-grid">
+                
+                <!-- Left Column: Steps -->
+                <div class="guide-content">
+                    <h2>How It Works</h2>
+                    
+                    <div class="guide-step-card active" id="step-1" onclick="selectStep(1)">
+                        <h3>
+                            <i data-lucide="keyboard"></i>
+                            1. Press & Hold Hotkey
+                        </h3>
+                        <p>
+                            Press and hold the global hotkey combo (Default: <kbd>Alt</kbd> + <kbd>LShift</kbd>). 
+                            The virtual keyboard lights up and a sleek floating pill pops up on your screen.
+                        </p>
+                    </div>
+
+                    <div class="guide-step-card" id="step-2" onclick="selectStep(2)">
+                        <h3>
+                            <i data-lucide="mic"></i>
+                            2. Speak Naturally
+                        </h3>
+                        <p>
+                            Speak your text, sentences, or phrases in English or Hinglish. 
+                            The floating pill shows high-fidelity animated waves indicating audio capture. A progress bar tracks duration.
+                        </p>
+                    </div>
+
+                    <div class="guide-step-card" id="step-3" onclick="selectStep(3)">
+                        <h3>
+                            <i data-lucide="cpu"></i>
+                            3. Release to Transcribe
+                        </h3>
+                        <p>
+                            Release the hotkey. The app stops recording and instantly streams the audio to Groq Whisper.
+                            The pill changes to a smooth, spinning blue loader ring.
+                        </p>
+                    </div>
+
+                    <div class="guide-step-card" id="step-4" onclick="selectStep(4)">
+                        <h3>
+                            <i data-lucide="check-circle-2"></i>
+                            4. Done & Auto-Paste
+                        </h3>
+                        <p>
+                            Within under a second, the transcription is finalized! 
+                            The pill displays a green checkmark indicating success, and automatically types the words directly into your active window.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Right Column: Live Interactive Simulator -->
+                <div class="simulator-container">
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <span style="font-size: 13px; font-weight: 600; color: var(--text-secondary); display: flex; align-items: center; gap: 6px;">
+                            <i data-lucide="terminal" style="width: 14px; height: 14px; color: var(--accent);"></i>
+                            SPITIT SANDBOX SIMULATOR
+                        </span>
+                        <button class="btn btn-primary" style="padding: 6px 14px; font-size: 12px; border-radius: 6px;" id="btn-simulate" onclick="startFullSimulation()">
+                            <i data-lucide="play" style="width: 12px; height: 12px;"></i> Run Simulation
+                        </button>
+                    </div>
+
+                    <!-- Mock Editor Window -->
+                    <div class="editor-window">
+                        <div class="editor-header">
+                            <span class="dot dot-red"></span>
+                            <span class="dot dot-yellow"></span>
+                            <span class="dot dot-green"></span>
+                            <span class="editor-title">notepad.exe - Untitled</span>
+                        </div>
+                        <div class="editor-body" id="editor-textarea">Click "Run Simulation" or click the step cards on the left to see Spitit in action!</div>
+                    </div>
+
+                    <!-- Virtual Keyboard -->
+                    <div class="virtual-keyboard">
+                        <div class="kbd-row">
+                            <div class="key">Esc</div>
+                            <div class="key">F1</div><div class="key">F2</div><div class="key">F3</div><div class="key">F4</div>
+                            <div class="key">F5</div><div class="key">F6</div><div class="key">F7</div><div class="key">F8</div>
+                        </div>
+                        <div class="kbd-row">
+                            <div class="key">~</div><div class="key">1</div><div class="key">2</div><div class="key">3</div>
+                            <div class="key">4</div><div class="key">5</div><div class="key">6</div><div class="key">7</div>
+                            <div class="key">8</div><div class="key">9</div><div class="key">0</div><div class="key">-</div>
+                        </div>
+                        <div class="kbd-row">
+                            <div class="key wide">Tab</div><div class="key">Q</div><div class="key">W</div><div class="key">E</div>
+                            <div class="key">R</div><div class="key">T</div><div class="key">Y</div><div class="key">U</div>
+                            <div class="key">I</div><div class="key">O</div><div class="key">P</div>
+                        </div>
+                        <div class="kbd-row">
+                            <div class="key wide">Caps</div><div class="key">A</div><div class="key">S</div><div class="key">D</div>
+                            <div class="key">F</div><div class="key">G</div><div class="key">H</div><div class="key">J</div>
+                            <div class="key">K</div><div class="key">L</div><div class="key wide">Enter</div>
+                        </div>
+                        <div class="kbd-row">
+                            <div class="key wide" id="key-lshift">LShift</div><div class="key">Z</div><div class="key">X</div>
+                            <div class="key">C</div><div class="key">V</div><div class="key">B</div><div class="key">N</div>
+                            <div class="key">M</div><div class="key">,</div><div class="key">.</div><div class="key wide">RShift</div>
+                        </div>
+                        <div class="kbd-row">
+                            <div class="key">Ctrl</div><div class="key">Win</div><div class="key" id="key-alt">Alt</div>
+                            <div class="key space">Space</div>
+                            <div class="key">Alt</div><div class="key">Ctrl</div>
+                        </div>
+                    </div>
+
+                    <!-- Simulated Floating Pill -->
+                    <div class="sim-pill" id="sim-pill">
+                        <!-- Fluid Wave Canvas (Recording) -->
+                        <div class="sim-wave-canvas">
+                            <svg class="sim-wave-svg" viewBox="0 0 120 34" xmlns="http://www.w3.org/2000/svg">
+                                <path class="sim-wave-path sim-wave-1" d="M 0 17 Q 30 9, 60 17 T 120 17 Q 150 25, 180 17 T 240 17 Q 270 9, 300 17 T 360 17" fill="none" stroke="#FFD505" stroke-width="1.5" opacity="0.35" />
+                                <path class="sim-wave-path sim-wave-2" d="M 0 17 Q 30 25, 60 17 T 120 17 Q 150 9, 180 17 T 240 17 Q 270 25, 300 17 T 360 17" fill="none" stroke="#FFD505" stroke-width="2" opacity="0.6" />
+                                <path class="sim-wave-path sim-wave-3" d="M 0 17 Q 15 5, 30 17 T 60 17 Q 75 29, 90 17 T 120 17 Q 135 5, 150 17 T 180 17 Q 195 29, 210 17 T 240 17 Q 255 5, 270 17 T 300 17 Q 315 29, 330 17 T 360 17" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.9" />
+                            </svg>
+                        </div>
+                        <!-- Transcribing Spinner (Transcribing) -->
+                        <div class="sim-spinner"></div>
+                        <!-- Done Checkmark (Done) -->
+                        <div class="sim-done">
+                            <i data-lucide="check"></i> 12 words
+                        </div>
+                        <!-- Progress bar at bottom of pill -->
+                        <div class="sim-progress-bar">
+                            <div class="sim-progress-fill" id="sim-progress-fill"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Code/Developer Section -->
+            <div class="code-window">
+                <div class="code-title">
+                    <i data-lucide="code-2" style="width: 18px; height: 18px;"></i>
+                    Developer API & Keyboard Bindings
+                </div>
+                <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; text-align: left;">
+                    Spitit is built in Python using cross-platform system hotkey bindings and CustomTkinter graphics. Below is the simplified underlying code wiring up the keyboard hold combo and managing the floating status pill states:
+                </p>
+                <pre class="code-block"><code><span class="comment"># src/hotkey.py - Global keyboard combo controller</span>
+<span class="keyword">import</span> keyboard
+
+<span class="keyword">class</span> <span class="builtin">HotkeyController</span>:
+    <span class="keyword">def</span> <span class="builtin">__init__</span>(self, hold_combo=<span class="string">"alt+left shift"</span>, on_start=None, on_stop=None):
+        self.hold_combo = hold_combo
+        self.on_start = on_start
+        self.on_stop = on_stop
+        self.is_active = <span class="keyword">False</span>
+
+    <span class="keyword">def</span> <span class="builtin">start</span>(self):
+        <span class="comment"># Global hook to intercept pressed keys</span>
+        keyboard.hook(self._on_key_event)
+
+    <span class="keyword">def</span> <span class="builtin">_on_key_event</span>(self, event):
+        <span class="keyword">if</span> keyboard.is_pressed(self.hold_combo):
+            <span class="keyword">if not</span> self.is_active:
+                self.is_active = <span class="keyword">True</span>
+                self.on_start()  <span class="comment"># Triggers recording and displays the status pill</span>
+        <span class="keyword">else</span>:
+            <span class="keyword">if</span> self.is_active:
+                self.is_active = <span class="keyword">False</span>
+                self.on_stop()   <span class="comment"># Stops recording and begins transcribing</span>
+</code></pre>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-brand">
+                <span class="brand-re">RE</span><span class="brand-real">REAL</span>
+            </div>
+            <p class="footer-copy">Built with ❤️ under REREAL — Where real meets unreal</p>
+        </div>
+    </footer>
+
+    <!-- Interactive JS Engine -->
+    <script>
+        lucide.createIcons();
+
+        // Simulator state manager
+        const editor = document.getElementById('editor-textarea');
+        const keyAlt = document.getElementById('key-alt');
+        const keyLShift = document.getElementById('key-lshift');
+        const pill = document.getElementById('sim-pill');
+        const progressFill = document.getElementById('sim-progress-fill');
+        
+        let typingTimeout = null;
+        let simTimeline = null;
+
+        // Reset simulator elements
+        function resetSimulator() {
+            clearTimeout(typingTimeout);
+            clearTimeout(simTimeline);
+            
+            keyAlt.classList.remove('active');
+            keyLShift.classList.remove('active');
+            
+            pill.className = 'sim-pill';
+            progressFill.style.width = '0%';
+            
+            document.querySelectorAll('.guide-step-card').forEach(c => c.classList.remove('active'));
+        }
+
+        // Click individual step
+        function selectStep(stepNum) {
+            resetSimulator();
+            document.getElementById(`step-${stepNum}`).classList.add('active');
+
+            if (stepNum === 1) {
+                // Step 1: Keyboard active, Pill visible & recording waves
+                keyAlt.classList.add('active');
+                keyLShift.classList.add('active');
+                
+                pill.className = 'sim-pill visible recording';
+                progressFill.style.width = '10%';
+                editor.textContent = "[Press hotkey and hold to speak...]";
+            } 
+            else if (stepNum === 2) {
+                // Step 2: Keyboard active, Pill capturing voice waves
+                keyAlt.classList.add('active');
+                keyLShift.classList.add('active');
+                
+                pill.className = 'sim-pill visible recording';
+                progressFill.style.width = '55%';
+                editor.textContent = "[Speaking naturally...] \"Spitit types whatever you speak, instantly...\"";
+            } 
+            else if (stepNum === 3) {
+                // Step 3: Keyboard release, Pill transcribing
+                pill.className = 'sim-pill visible transcribing';
+                editor.textContent = "[Transcribing audio directly with Groq Whisper...]";
+            } 
+            else if (stepNum === 4) {
+                // Step 4: Pill done, Auto-pasting text
+                pill.className = 'sim-pill visible done';
+                typeText("Spitit types whatever you speak, instantly! Hinglish works too! ✓");
+            }
+        }
+
+        // Typewriter effect
+        function typeText(text, index = 0) {
+            if (index === 0) {
+                editor.textContent = "";
+            }
+            if (index < text.length) {
+                editor.textContent += text.charAt(index);
+                typingTimeout = setTimeout(() => typeText(text, index + 1), 35);
+            } else {
+                // Auto hide pill after success
+                typingTimeout = setTimeout(() => {
+                    pill.classList.remove('visible');
+                }, 1500);
+            }
+        }
+
+        // Full Automated Simulation
+        function startFullSimulation() {
+            resetSimulator();
+            
+            // Step 1: Initial Press (0s)
+            selectStep(1);
+            
+            // Step 2: Speaking (1.8s)
+            simTimeline = setTimeout(() => {
+                selectStep(2);
+                
+                // Animate progress bar filling during speaking
+                let p = 55;
+                const progressInterval = setInterval(() => {
+                    if (p < 95 && pill.classList.contains('recording')) {
+                        p += 5;
+                        progressFill.style.width = p + '%';
+                    } else {
+                        clearInterval(progressInterval);
+                    }
+                }, 100);
+                
+            }, 1800);
+
+            // Step 3: Release & Transcribe (3.8s)
+            simTimeline = setTimeout(() => {
+                selectStep(3);
+            }, 3800);
+
+            // Step 4: Done & Paste (5.2s)
+            simTimeline = setTimeout(() => {
+                selectStep(4);
+            }, 5200);
+        }
+    </script>
+</body>
+</html>

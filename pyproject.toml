@@ -1,0 +1,10 @@
+[project]
+name = "rereal-spitit"
+version = "2.0.0"
+description = "REREAL - Spitit: voice to text for Windows"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "Vikas Nath"}]
+
+[tool.pyinstaller]
+name = "REREAL-Spitit"

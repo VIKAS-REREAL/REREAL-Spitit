@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+*.egg
+
+# PyInstaller
+*.manifest
+*.spec.bak
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build outputs
+dist/
+dist_installer/
+build/
+
+# Config (user-specific, never commit)
+config.json
+
+# OS
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Generated assets (rebuild with scripts)
+# assets/icon.ico
+# assets/sound/done.wav

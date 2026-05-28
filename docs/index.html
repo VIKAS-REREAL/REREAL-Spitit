@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="REREAL - Spitit: The fastest voice-to-text for Windows. Powered by Groq Whisper. No login. No cloud. Just speak.">
+    <meta name="keywords" content="voice to text, speech recognition, Windows, Groq, Whisper, transcription, Hinglish">
+    <meta name="author" content="REREAL">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="REREAL - Spitit | Voice to Text for Windows">
+    <meta property="og:description" content="The fastest voice-to-text for Windows. Powered by Groq Whisper. No login. No cloud. Just speak.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://vikas-rereal.github.io/REREAL-Spitit/">
+    
+    <title>REREAL - Spitit | Speak. Release. Done.</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="icon.ico">
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+    <!-- Animated background orbs -->
+    <div class="bg-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <div class="container">
+            <div class="hero-badge">
+                <span class="badge-dot"></span>
+                <span>Open Source & Free</span>
+            </div>
+            
+            <h1 class="hero-title">
+                <span class="brand-re">RE</span><span class="brand-real">REAL</span>
+                <span class="brand-sep">·</span>
+                <span class="brand-spitit">Spitit</span>
+            </h1>
+            
+            <p class="hero-tagline">Speak. Release. Done.</p>
+            
+            <p class="hero-desc">
+                The fastest voice-to-text for Windows.<br>
+                Powered by Groq Whisper. No login. No cloud. Just speak.
+            </p>
+            
+            <div class="hero-buttons">
+                <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/latest/download/REREAL-Spitit-Setup-2.0.0.exe" class="btn btn-primary">
+                    <i data-lucide="download" class="btn-icon-svg"></i>
+                    Download Installer
+                </a>
+                <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/latest/download/REREAL-Spitit.exe" class="btn btn-ghost">
+                    <i data-lucide="download" class="btn-icon-svg"></i>
+                    Download Portable
+                </a>
+                <a href="guide.html" class="btn btn-ghost btn-guide">
+                    <i data-lucide="book-open" class="btn-icon-svg"></i>
+                    Interactive Guide
+                </a>
+            </div>
+
+            <!-- Animated pill demo -->
+            <div class="pill-demo">
+                <div class="pill-container" id="pill-demo-container">
+                    <div class="sim-pill visible recording" id="pill-demo" style="position: relative; bottom: auto; right: auto; margin: 0 auto; overflow: hidden;">
+                        <!-- Fluid Wave Canvas (Recording) -->
+                        <div class="sim-wave-canvas">
+                            <svg class="sim-wave-svg" viewBox="0 0 120 34" xmlns="http://www.w3.org/2000/svg">
+                                <path class="sim-wave-path sim-wave-1" d="M 0 17 Q 30 9, 60 17 T 120 17 Q 150 25, 180 17 T 240 17 Q 270 9, 300 17 T 360 17" fill="none" stroke="#FFD505" stroke-width="1.5" opacity="0.35" />
+                                <path class="sim-wave-path sim-wave-2" d="M 0 17 Q 30 25, 60 17 T 120 17 Q 150 9, 180 17 T 240 17 Q 270 25, 300 17 T 360 17" fill="none" stroke="#FFD505" stroke-width="2" opacity="0.6" />
+                                <path class="sim-wave-path sim-wave-3" d="M 0 17 Q 15 5, 30 17 T 60 17 Q 75 29, 90 17 T 120 17 Q 135 5, 150 17 T 180 17 Q 195 29, 210 17 T 240 17 Q 255 5, 270 17 T 300 17 Q 315 29, 330 17 T 360 17" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.9" />
+                            </svg>
+                        </div>
+                        <!-- Transcribing Spinner (Transcribing) -->
+                        <div class="sim-spinner"></div>
+                        <!-- Done Checkmark (Done) -->
+                        <div class="sim-done">
+                            <i data-lucide="check"></i> 12 words
+                        </div>
+                        <!-- Progress bar at bottom of pill -->
+                        <div class="sim-progress-bar">
+                            <div class="sim-progress-fill" id="pill-demo-progress" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    <div class="pill-label" id="pill-demo-label" style="margin-top: 8px;">Recording...</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">Built for Speed & Privacy</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i data-lucide="zap"></i></div>
+                    <h3>Groq Whisper Speed</h3>
+                    <p>Transcription in under a second. Groq's LPU inference makes real-time voice-to-text feel instant.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i data-lucide="globe"></i></div>
+                    <h3>Hinglish Support</h3>
+                    <p>Speak Hindi, type in Roman script. Perfect for Indian users who think in Hindi but type in English.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i data-lucide="keyboard"></i></div>
+                    <h3>Custom Hotkeys</h3>
+                    <p>Record any key combo that works for you. Hold-to-talk or toggle mode — your workflow, your rules.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i data-lucide="target"></i></div>
+                    <h3>Smart Auto-Paste</h3>
+                    <p>Transcription appears exactly where you're typing. No copy-paste needed — it just works.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i data-lucide="bell-off"></i></div>
+                    <h3>System Tray</h3>
+                    <p>Lives quietly in your system tray. Zero screen clutter. A tiny floating pill shows state — that's it.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i data-lucide="shield-check"></i></div>
+                    <h3>100% Private</h3>
+                    <p>Your audio goes directly to Groq's API — never through our servers. No telemetry. No tracking. Zero.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it Works Section -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="container">
+            <h2 class="section-title">How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Set your Groq API key</h3>
+                        <p>Get a free API key from <a href="https://console.groq.com" target="_blank" rel="noopener">console.groq.com</a> and paste it in Settings.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Hold your hotkey and speak</h3>
+                        <p>Press and hold <kbd>Alt</kbd> + <kbd>LShift</kbd> (or your custom combo) and speak naturally.</p>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Transcription appears where you're typing</h3>
+                        <p>Release the hotkey. Your speech is transcribed in under a second and typed into your active window.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section class="download" id="download">
+        <div class="container">
+            <h2 class="section-title">Get REREAL - Spitit</h2>
+            
+            <div class="platform-badge">
+                <i data-lucide="monitor" class="platform-icon-svg"></i>
+                <span>Windows 10 / 11</span>
+            </div>
+ 
+            <div class="download-cards">
+                <div class="download-card recommended">
+                    <div class="download-tag">Recommended</div>
+                    <h3>Installer</h3>
+                    <p>Full setup wizard with desktop shortcut, Start Menu entry, and optional startup launch.</p>
+                    <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/latest/download/REREAL-Spitit-Setup-2.0.0.exe" class="btn btn-primary btn-full">
+                        <i data-lucide="download" class="btn-icon-svg"></i> Download Installer
+                    </a>
+                    <span class="download-size">~50 MB</span>
+                </div>
+                <div class="download-card">
+                    <h3>Portable</h3>
+                    <p>Single .exe file. No installation needed. Run from anywhere — USB drive, desktop, whatever.</p>
+                    <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/latest/download/REREAL-Spitit.exe" class="btn btn-ghost btn-full">
+                        <i data-lucide="download" class="btn-icon-svg"></i> Download Portable
+                    </a>
+                    <span class="download-size">~50 MB</span>
+                </div>
+            </div>
+
+            <div class="system-req">
+                <h4>System Requirements</h4>
+                <ul>
+                    <li>Windows 10 or 11 (64-bit)</li>
+                    <li>~50 MB disk space</li>
+                    <li>Internet connection (for transcription)</li>
+                    <li>A microphone</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-brand">
+                <span class="brand-re">RE</span><span class="brand-real">REAL</span>
+            </div>
+            <p class="footer-tagline">Where real meets unreal</p>
+            
+            <div class="footer-links">
+                <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
+                <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit/issues" target="_blank" rel="noopener">Issues</a>
+            </div>
+            
+            <p class="footer-copy">Built with ❤️ under REREAL — Where real meets unreal</p>
+        </div>
+    </footer>
+
+    <script>
+        // Pill demo animation: cycle through states
+        const pillDemo = document.getElementById('pill-demo');
+        const pillLabel = document.getElementById('pill-demo-label');
+        const progressFill = document.getElementById('pill-demo-progress');
+        const states = [
+            { cls: 'recording', label: 'Recording...' },
+            { cls: 'transcribing', label: 'Transcribing...' },
+            { cls: 'done', label: 'Done!' },
+        ];
+        let stateIdx = 0;
+        let progressVal = 0;
+
+        // Progress bar simulation in recording state
+        setInterval(() => {
+            if (states[stateIdx].cls === 'recording') {
+                progressVal = (progressVal + 8) % 100;
+                progressFill.style.width = progressVal + '%';
+            }
+        }, 150);
+        
+        setInterval(() => {
+            stateIdx = (stateIdx + 1) % states.length;
+            
+            // Remove previous state classes and apply the new one
+            pillDemo.className = 'sim-pill visible ' + states[stateIdx].cls;
+            pillLabel.textContent = states[stateIdx].label;
+            
+            if (states[stateIdx].cls === 'recording') {
+                progressVal = 0;
+                progressFill.style.width = '0%';
+            }
+        }, 3000);
+
+        // Initialize Lucide Icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
