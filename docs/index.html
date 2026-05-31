@@ -59,7 +59,7 @@
             </p>
             
             <div class="hero-buttons">
-                <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/latest/download/REREAL-Spitit-Setup-2.0.0.exe" class="btn btn-primary">
+                <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/latest/download/REREAL-Spitit-Setup-2.0.1.exe" class="btn btn-primary">
                     <i data-lucide="download" class="btn-icon-svg"></i>
                     Download Installer
                 </a>
@@ -186,7 +186,7 @@
                     <div class="download-tag">Recommended</div>
                     <h3>Installer</h3>
                     <p>Full setup wizard with desktop shortcut, Start Menu entry, and optional startup launch.</p>
-                    <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/latest/download/REREAL-Spitit-Setup-2.0.0.exe" class="btn btn-primary btn-full">
+                    <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/latest/download/REREAL-Spitit-Setup-2.0.1.exe" class="btn btn-primary btn-full">
                         <i data-lucide="download" class="btn-icon-svg"></i> Download Installer
                     </a>
                     <span class="download-size">~50 MB</span>
@@ -272,9 +272,17 @@
         fetch('https://api.github.com/repos/VIKAS-REREAL/REREAL-Spitit/releases/latest')
             .then(res => res.json())
             .then(data => {
-                const assets = data.assets;
-                const installer = assets.find(a => a.name.includes('Setup') && a.name.endsWith('.exe'));
-                const portable = assets.find(a => !a.name.includes('Setup') && a.name.endsWith('.exe'));
+                const assets = data.assets || [];
+                
+                // Filter and sort setup installers by updated_at descending
+                const installers = assets.filter(a => a.name.includes('Setup') && a.name.endsWith('.exe'));
+                installers.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+                const installer = installers[0];
+                
+                // Filter and sort portable executables by updated_at descending
+                const portables = assets.filter(a => !a.name.includes('Setup') && a.name.endsWith('.exe'));
+                portables.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+                const portable = portables[0];
                 
                 if (installer) {
                     document.querySelectorAll('a').forEach(btn => {

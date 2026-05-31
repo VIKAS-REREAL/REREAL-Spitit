@@ -5,7 +5,7 @@ REREAL - Spitit: GitHub Releases update checker & parser.
 import re
 
 REPO = "VIKAS-REREAL/REREAL-Spitit"
-CURRENT_VERSION = "2.0.0"
+from src.config import VERSION as CURRENT_VERSION
 
 
 def _version_tuple(v: str) -> tuple:

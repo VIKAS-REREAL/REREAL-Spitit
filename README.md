@@ -40,8 +40,8 @@
 
 | Type | Description | Link |
 |------|-------------|------|
-| **Installer** (recommended) | Full setup wizard with shortcuts | [Download](https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/latest) |
-| **Portable** | Single .exe, no install needed | [Download](https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/latest) |
+| **Installer** (recommended) | Full setup wizard with shortcuts | [Download v2.0.1](https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/download/latest/REREAL-Spitit-Setup-2.0.1.exe) |
+| **Portable** | Single .exe, no install needed | [Download v2.0.1 (Portable)](https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/download/latest/REREAL-Spitit.exe) |
 
 **System Requirements:** Windows 10/11 (64-bit), ~50MB disk, internet for transcription, a microphone.
 

@@ -5,6 +5,14 @@ All notable changes to REREAL - Spitit will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2026-05-31
+
+### Fixed
+- Fixed global Windows hotkey freezing and timeout bug (implemented single keyboard hook, 30s watchdog refresh, and sleep/wake monitor).
+- Resolved `AttributeError: module 'ctypes.wintypes' has no attribute 'HCURSOR'` crash on startup.
+- Fixed auto-updater checking loop by syncing versions directly with a single source of truth (`src/config.py`).
+- Enhanced GitHub Pages download scripts to always grab the newest rolling release asset via `updated_at` sorting.
+
 ## [2.0.0] - 2026-05-29
 
 ### Added
