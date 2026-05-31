@@ -59,11 +59,11 @@
             </p>
             
             <div class="hero-buttons">
-                <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/latest/download/REREAL-Spitit-Setup-2.0.1.exe" class="btn btn-primary">
+                <a href="#" class="btn btn-primary" id="hero-installer-btn">
                     <i data-lucide="download" class="btn-icon-svg"></i>
                     Download Installer
                 </a>
-                <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/latest/download/REREAL-Spitit.exe" class="btn btn-ghost">
+                <a href="#" class="btn btn-ghost" id="hero-portable-btn">
                     <i data-lucide="download" class="btn-icon-svg"></i>
                     Download Portable
                 </a>
@@ -80,9 +80,9 @@
                         <!-- Fluid Wave Canvas (Recording) -->
                         <div class="sim-wave-canvas">
                             <svg class="sim-wave-svg" viewBox="0 0 120 34" xmlns="http://www.w3.org/2000/svg">
-                                <path class="sim-wave-path sim-wave-1" d="M 0 17 Q 30 9, 60 17 T 120 17 Q 150 25, 180 17 T 240 17 Q 270 9, 300 17 T 360 17" fill="none" stroke="#FFD505" stroke-width="1.5" opacity="0.35" />
-                                <path class="sim-wave-path sim-wave-2" d="M 0 17 Q 30 25, 60 17 T 120 17 Q 150 9, 180 17 T 240 17 Q 270 25, 300 17 T 360 17" fill="none" stroke="#FFD505" stroke-width="2" opacity="0.6" />
-                                <path class="sim-wave-path sim-wave-3" d="M 0 17 Q 15 5, 30 17 T 60 17 Q 75 29, 90 17 T 120 17 Q 135 5, 150 17 T 180 17 Q 195 29, 210 17 T 240 17 Q 255 5, 270 17 T 300 17 Q 315 29, 330 17 T 360 17" fill="none" stroke="#FFFFFF" stroke-width="2.5" opacity="0.9" />
+                                <path class="sim-wave-path sim-wave-1" d="M 0 17 Q 30 9, 60 17 T 120 17 Q 150 25, 180 17 T 240 17 Q 270 9, 300 17 T 360 17" fill="none" stroke="#FFD505" stroke-width="2"/>
+                                <path class="sim-wave-path sim-wave-2" d="M 0 17 Q 30 25, 60 17 T 120 17 Q 150 9, 180 17 T 240 17 Q 270 25, 300 17 T 360 17" fill="none" stroke="#FFD505" stroke-width="2"/>
+                                <path class="sim-wave-path sim-wave-3" d="M 0 17 Q 15 5, 30 17 T 60 17 Q 75 29, 90 17 T 120 17 Q 135 5, 150 17 T 180 17 Q 195 29, 210 17 T 240 17 Q 255 5, 270 17 T 300 17" fill="none" stroke="#FFD505" stroke-width="1.5" opacity="0.7"/>
                             </svg>
                         </div>
                         <!-- Transcribing Spinner (Transcribing) -->
@@ -182,22 +182,34 @@
             </div>
  
             <div class="download-cards">
-                <div class="download-card recommended">
+                <div class="download-card recommended" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
                     <div class="download-tag">Recommended</div>
                     <h3>Installer</h3>
                     <p>Full setup wizard with desktop shortcut, Start Menu entry, and optional startup launch.</p>
-                    <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/latest/download/REREAL-Spitit-Setup-2.0.1.exe" class="btn btn-primary btn-full">
+                    <a href="#" class="btn btn-primary btn-full" id="download-installer-btn">
                         <i data-lucide="download" class="btn-icon-svg"></i> Download Installer
                     </a>
-                    <span class="download-size">~50 MB</span>
+                    
+                    <!-- Older Versions Dropdown -->
+                    <div class="dropdown" style="margin-top: 12px; position: relative; width: 100%;">
+                        <button class="btn btn-ghost btn-full" id="older-versions-btn" style="display: flex; justify-content: space-between; align-items: center; width: 100%; border: 1px solid rgba(255, 213, 5, 0.25);">
+                            <span>Download Older Versions</span>
+                            <i data-lucide="chevron-down" class="chevron-icon" style="width: 16px; height: 16px; transition: transform 0.2s;"></i>
+                        </button>
+                        <div class="dropdown-content" id="older-versions-dropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: rgba(26, 26, 36, 0.98); border: 1px solid rgba(255, 213, 5, 0.25); border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.6); z-index: 10; margin-top: 4px; overflow: hidden; padding: 4px 0;">
+                            <!-- Dynamically populated links -->
+                        </div>
+                    </div>
+                    
+                    <span class="download-size" style="margin-top: 12px;">~50 MB</span>
                 </div>
-                <div class="download-card">
+                <div class="download-card" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
                     <h3>Portable</h3>
                     <p>Single .exe file. No installation needed. Run from anywhere — USB drive, desktop, whatever.</p>
-                    <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/latest/download/REREAL-Spitit.exe" class="btn btn-ghost btn-full">
+                    <a href="#" class="btn btn-ghost btn-full" id="download-portable-btn">
                         <i data-lucide="download" class="btn-icon-svg"></i> Download Portable
                     </a>
-                    <span class="download-size">~50 MB</span>
+                    <span class="download-size" style="margin-top: 12px;">~50 MB</span>
                 </div>
             </div>
 
@@ -268,38 +280,112 @@
         // Initialize Lucide Icons
         lucide.createIcons();
 
-        // Dynamically fetch latest release assets from GitHub API to update download buttons
-        fetch('https://api.github.com/repos/VIKAS-REREAL/REREAL-Spitit/releases/latest')
-            .then(res => res.json())
-            .then(data => {
+        // Older Versions Dropdown Event Handling
+        const toggleBtn = document.getElementById('older-versions-btn');
+        const dropdownContent = document.getElementById('older-versions-dropdown');
+        const chevron = toggleBtn.querySelector('.chevron-icon');
+
+        toggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isVisible = dropdownContent.style.display === 'block';
+            dropdownContent.style.display = isVisible ? 'none' : 'block';
+            chevron.style.transform = isVisible ? 'rotate(0deg)' : 'rotate(180deg)';
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+            dropdownContent.style.display = 'none';
+            chevron.style.transform = 'rotate(0deg)';
+        });
+
+        // Dynamically fetch latest release assets from GitHub API to update ALL download buttons
+        async function updateDownloadLinks() {
+            try {
+                const response = await fetch('https://api.github.com/repos/VIKAS-REREAL/REREAL-Spitit/releases/latest');
+                if (!response.ok) throw new Error('Failed to fetch release');
+                
+                const data = await response.json();
                 const assets = data.assets || [];
                 
                 // Filter and sort setup installers by updated_at descending
                 const installers = assets.filter(a => a.name.includes('Setup') && a.name.endsWith('.exe'));
                 installers.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-                const installer = installers[0];
+                
+                const installerAsset = installers[0];
+                const olderInstallers = installers.slice(1);
                 
                 // Filter and sort portable executables by updated_at descending
                 const portables = assets.filter(a => !a.name.includes('Setup') && a.name.endsWith('.exe'));
                 portables.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-                const portable = portables[0];
+                const portableAsset = portables[0];
                 
-                if (installer) {
-                    document.querySelectorAll('a').forEach(btn => {
-                        if (btn.href.includes('Setup') || btn.textContent.includes('Installer')) {
-                            btn.href = installer.browser_download_url;
-                        }
-                    });
+                // Update all download buttons with latest links
+                if (installerAsset) {
+                    document.getElementById('hero-installer-btn').href = installerAsset.browser_download_url;
+                    document.getElementById('download-installer-btn').href = installerAsset.browser_download_url;
                 }
-                if (portable) {
-                    document.querySelectorAll('a').forEach(btn => {
-                        if (btn.href.endsWith('REREAL-Spitit.exe') || btn.textContent.includes('Portable')) {
-                            btn.href = portable.browser_download_url;
-                        }
-                    });
+                
+                if (portableAsset) {
+                    document.getElementById('hero-portable-btn').href = portableAsset.browser_download_url;
+                    document.getElementById('download-portable-btn').href = portableAsset.browser_download_url;
                 }
-            })
-            .catch(err => console.warn("Failed to fetch latest GitHub release assets, utilizing default redirect links:", err));
+
+                // Populate older versions dropdown
+                dropdownContent.innerHTML = '';
+                
+                if (olderInstallers.length > 0) {
+                    olderInstallers.forEach(asset => {
+                        const match = asset.name.match(/Setup-(\d+\.\d+\.\d+(?:\.\d+)?)/);
+                        const ver = match ? `v${match[1]}` : asset.name;
+                        
+                        const item = document.createElement('a');
+                        item.href = asset.browser_download_url;
+                        item.textContent = `Version ${ver}`;
+                        item.style.display = 'block';
+                        item.style.padding = '10px 16px';
+                        item.style.color = '#FFFFFF';
+                        item.style.textDecoration = 'none';
+                        item.style.fontSize = '14px';
+                        item.style.transition = 'background 0.2s, color 0.2s';
+                        item.style.cursor = 'pointer';
+                        item.style.textAlign = 'left';
+                        
+                        item.onmouseover = () => {
+                            item.style.background = 'rgba(255, 213, 5, 0.15)';
+                            item.style.color = '#FFD505';
+                        };
+                        item.onmouseout = () => {
+                            item.style.background = 'none';
+                            item.style.color = '#FFFFFF';
+                        };
+                        
+                        dropdownContent.appendChild(item);
+                    });
+                } else {
+                    const noVersionsMsg = document.createElement('div');
+                    noVersionsMsg.textContent = 'No older versions found';
+                    noVersionsMsg.style.padding = '10px 16px';
+                    noVersionsMsg.style.color = 'rgba(255,255,255,0.5)';
+                    noVersionsMsg.style.fontSize = '13px';
+                    noVersionsMsg.style.textAlign = 'left';
+                    dropdownContent.appendChild(noVersionsMsg);
+                }
+                
+                console.log('✓ Download links updated with latest release assets (sorted by upload date)');
+            } catch (error) {
+                console.warn('Failed to fetch latest release assets from GitHub API:', error);
+                // Fallback: use direct release links to latest
+                const latestReleaseUrl = 'https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/latest/download';
+                document.getElementById('hero-installer-btn').href = latestReleaseUrl + '/REREAL-Spitit-Setup.exe';
+                document.getElementById('download-installer-btn').href = latestReleaseUrl + '/REREAL-Spitit-Setup.exe';
+                document.getElementById('hero-portable-btn').href = latestReleaseUrl + '/REREAL-Spitit.exe';
+                document.getElementById('download-portable-btn').href = latestReleaseUrl + '/REREAL-Spitit.exe';
+                console.log('✓ Download links set to latest release redirect URLs');
+            }
+        }
+
+        // Call on page load
+        updateDownloadLinks();
     </script>
 </body>
 </html>
