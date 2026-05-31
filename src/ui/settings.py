@@ -826,15 +826,114 @@ class SettingsWindow:
     def _show_update_result(self, result: dict):
         if result["available"]:
             self._update_status.configure(
-                text=f"Update available: v{result['version']}",
+                text=f"New version v{result['version']} found! Starting auto-update...",
                 text_color=ACCENT,
             )
-            # Could add download button here
+            # Start downloading and installing in a background thread
+            threading.Thread(target=self._download_and_install_update, args=(result,), daemon=True).start()
         else:
             self._update_status.configure(
                 text="✓ You're on the latest version",
                 text_color=STATE_DONE,
             )
+
+    def _download_and_install_update(self, result: dict):
+        import urllib.request
+        import sys
+        import os
+        import subprocess
+        import time
+        from pathlib import Path
+
+        try:
+            # 1. Determine if installed or portable
+            exe_dir = Path(sys.executable).parent
+            is_installed = (exe_dir / "unins000.exe").exists() or "Program Files" in str(exe_dir)
+            is_frozen = getattr(sys, "frozen", False)
+            
+            if is_installed and is_frozen:
+                download_url = result["setup_url"]
+                filename = f"REREAL-Spitit-Setup-{result['version']}.exe"
+            else:
+                download_url = result["portable_url"]
+                filename = "REREAL-Spitit-New.exe"
+
+            if not download_url:
+                download_url = result["setup_url"] or result["portable_url"]
+                if not download_url:
+                    self._root.after(0, lambda: self._update_status.configure(
+                        text="✗ Update failed: download URL not found", text_color=STATE_ERROR
+                    ))
+                    return
+
+            # Download directory: LOCALAPPDATA\REREAL_Spitit
+            from src.config import get_config_dir
+            download_dir = get_config_dir()
+            dest_path = download_dir / filename
+
+            # 2. Download the file in chunks and report progress
+            req = urllib.request.Request(
+                download_url,
+                headers={"User-Agent": "REREAL-Spitit-Updater"}
+            )
+            
+            with urllib.request.urlopen(req) as response:
+                total_size = int(response.info().get('Content-Length', 0))
+                downloaded = 0
+                block_size = 1024 * 64
+                
+                with open(dest_path, "wb") as f:
+                    while True:
+                        chunk = response.read(block_size)
+                        if not chunk:
+                            break
+                        f.write(chunk)
+                        downloaded += len(chunk)
+                        
+                        if total_size > 0:
+                            percent = int(downloaded * 100 / total_size)
+                            self._root.after(0, lambda p=percent: self._update_status.configure(
+                                text=f"Downloading update: {p}%...", text_color=ACCENT
+                            ))
+                            
+            self._root.after(0, lambda: self._update_status.configure(
+                text="Installing update...", text_color=STATE_DONE
+            ))
+            time.sleep(1)
+
+            # 3. Execute installation and exit
+            if is_installed and is_frozen:
+                # Launch setup program normally so user can complete modern wizard
+                subprocess.Popen([str(dest_path)])
+            else:
+                # Portable mode: use a self-deleting batch file to overwrite the active executable
+                current_exe = Path(sys.executable)
+                bat_path = download_dir / "update_spitit.bat"
+                
+                if is_frozen:
+                    target_exe = current_exe
+                else:
+                    target_exe = exe_dir / "REREAL-Spitit.exe"
+                
+                bat_content = f"""@echo off
+timeout /t 2 /nobreak > nul
+move /y "{dest_path}" "{target_exe}"
+start "" "{target_exe}"
+del "%~f0"
+"""
+                with open(bat_path, "w", encoding="ascii") as f:
+                    f.write(bat_content)
+                
+                subprocess.Popen([str(bat_path)], shell=True)
+
+            # Close application immediately to free file locks
+            self._root.after(0, lambda: os._exit(0))
+
+        except Exception as e:
+            print(f"[Updater] Error during update download/install: {e}")
+            self._root.after(0, lambda err=e: self._update_status.configure(
+                text=f"✗ Update failed: {str(err)[:40]}", text_color=STATE_ERROR
+            ))
 
     # ── Footer ──────────────────────────────────────────────────────────────
 

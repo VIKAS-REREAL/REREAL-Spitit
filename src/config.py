@@ -12,7 +12,7 @@ from datetime import datetime
 
 APP_NAME = "REREAL_Spitit"
 CONFIG_FILENAME = "config.json"
-VERSION = "2.0.0"
+VERSION = "2.0.1"
 MAX_HISTORY = 50
 
 DEFAULTS = {

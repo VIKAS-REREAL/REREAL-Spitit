@@ -1,11 +1,13 @@
 """
 REREAL - Spitit: Global hotkey controller.
 Supports hold-to-talk and toggle-to-talk modes with custom key combos.
+Uses a single keyboard hook, 30-second watchdog timer, and sleep/wake monitor.
 """
 
 import threading
 import time
-
+import ctypes
+from ctypes import wintypes
 
 # Key name normalization: keyboard library names → display names
 KEY_DISPLAY = {
@@ -82,6 +84,19 @@ WARN_COMBOS = {
     frozenset(["ctrl", "a"]),
 }
 
+# Modifier name normalization aliases
+MODIFIER_ALIASES = {
+    "left shift": "shift",
+    "right shift": "shift",
+    "left alt": "alt",
+    "right alt": "alt",
+    "left ctrl": "ctrl",
+    "right ctrl": "ctrl",
+    "left windows": "win",
+    "right windows": "win",
+    "win": "win",
+}
+
 
 def format_combo(combo_str: str) -> str:
     """Format a combo string for display. E.g. 'alt+left shift' → 'Alt + LShift'"""
@@ -130,19 +145,130 @@ def validate_combo(combo_str: str) -> tuple[bool, str]:
     return True, ""
 
 
+def get_key_variations(key: str) -> set[str]:
+    """Get all representation variations of a key (e.g. 'left shift' -> {'left shift', 'shift'})."""
+    variations = {key}
+    alias = MODIFIER_ALIASES.get(key)
+    if alias:
+        variations.add(alias)
+    if key == "shift":
+        variations.update({"left shift", "right shift"})
+    elif key == "alt":
+        variations.update({"left alt", "right alt"})
+    elif key == "ctrl":
+        variations.update({"left ctrl", "right ctrl"})
+    elif key == "win":
+        variations.update({"left windows", "right windows"})
+    return variations
+
+
+# Win32 Power Broadcast Definitions
+WM_POWERBROADCAST = 0x0218
+PBT_APMRESUMESUSPEND = 0x0007
+PBT_APMRESUMEAUTOMATIC = 0x0012
+
+WNDPROC = ctypes.WINFUNCTYPE(ctypes.c_int64, wintypes.HWND, ctypes.c_uint, wintypes.WPARAM, wintypes.LPARAM)
+
+
+class WNDCLASSEX(ctypes.Structure):
+    _fields_ = [
+        ("cbSize", ctypes.c_uint),
+        ("style", ctypes.c_uint),
+        ("lpfnWndProc", WNDPROC),
+        ("cbClsExtra", ctypes.c_int),
+        ("cbWndExtra", ctypes.c_int),
+        ("hInstance", wintypes.HINSTANCE),
+        ("hIcon", wintypes.HICON),
+        ("hCursor", wintypes.HCURSOR),
+        ("hbrBackground", wintypes.HBRUSH),
+        ("lpszMenuName", wintypes.LPCWSTR),
+        ("lpszClassName", wintypes.LPCWSTR),
+        ("hIconSm", wintypes.HICON),
+    ]
+
+
+class PowerMonitor(threading.Thread):
+    """
+    Win32 power monitor that registers a hidden message-only window and listens for
+    WM_POWERBROADCAST to detect wake from sleep.
+    """
+    def __init__(self, callback):
+        super().__init__(daemon=True)
+        self.callback = callback
+        self.hwnd = None
+        self._running = True
+        self._wnd_proc = None
+
+    def run(self):
+        try:
+            user32 = ctypes.windll.user32
+            kernel32 = ctypes.windll.kernel32
+
+            def wnd_proc(hwnd, msg, wparam, lparam):
+                if msg == WM_POWERBROADCAST:
+                    if wparam in (PBT_APMRESUMESUSPEND, PBT_APMRESUMEAUTOMATIC):
+                        try:
+                            self.callback()
+                        except Exception as e:
+                            print(f"[PowerMonitor] Callback error: {e}")
+                return user32.DefWindowProcW(hwnd, msg, wparam, lparam)
+
+            self._wnd_proc = WNDPROC(wnd_proc)
+            hinstance = kernel32.GetModuleHandleW(None)
+
+            wndclass = WNDCLASSEX()
+            wndclass.cbSize = ctypes.sizeof(WNDCLASSEX)
+            wndclass.style = 0
+            wndclass.lpfnWndProc = self._wnd_proc
+            wndclass.cbClsExtra = 0
+            wndclass.cbWndExtra = 0
+            wndclass.hInstance = hinstance
+            wndclass.hIcon = 0
+            wndclass.hCursor = 0
+            wndclass.hbrBackground = 0
+            wndclass.lpszMenuName = None
+            wndclass.lpszClassName = "SpititPowerMonitorClass"
+            wndclass.hIconSm = 0
+
+            user32.RegisterClassExW(ctypes.byref(wndclass))
+
+            HWND_MESSAGE = -3
+            self.hwnd = user32.CreateWindowExW(
+                0,
+                wndclass.lpszClassName,
+                "SpititPowerMonitorWindow",
+                0, 0, 0, 0, 0,
+                HWND_MESSAGE,
+                0,
+                hinstance,
+                None
+            )
+
+            if not self.hwnd:
+                return
+
+            msg = wintypes.MSG()
+            while self._running:
+                ret = user32.GetMessageW(ctypes.byref(msg), 0, 0, 0)
+                if ret == 0 or ret == -1:
+                    break
+                user32.TranslateMessage(ctypes.byref(msg))
+                user32.DispatchMessageW(ctypes.byref(msg))
+        except Exception as e:
+            print(f"[PowerMonitor] Error: {e}")
+
+    def stop(self):
+        self._running = False
+        if self.hwnd:
+            try:
+                ctypes.windll.user32.PostMessageW(self.hwnd, 0x0012, 0, 0)  # WM_QUIT = 0x0012
+            except Exception:
+                pass
+
+
 class HotkeyController:
     """
-    Global hotkey controller supporting hold-to-talk and toggle-to-talk modes.
-    
-    Usage:
-        controller = HotkeyController(
-            hold_combo="alt+left shift",
-            toggle_combo="alt+left shift+space",
-            mode="hold",
-            on_start=start_recording,
-            on_stop=stop_recording,
-        )
-        controller.start()
+    Global hotkey controller using a single hook, watchdog timer, and sleep/wake monitor.
     """
 
     def __init__(
@@ -158,132 +284,198 @@ class HotkeyController:
         self.mode = mode
         self.on_start = on_start
         self.on_stop = on_stop
-        self._active = False
-        self._toggle_recording = False
-        self._hold_pressed = False
-        self._hooks = []
+
         self._running = False
+        self._pressed_keys = set()
+        self._hold_pressed = False
+        self._toggle_pressed = False
+        self._toggle_recording = False
+
+        self._hook = None
+        self._watchdog = None
+        self._power_monitor = None
         self._lock = threading.Lock()
 
     def start(self):
-        """Register global hotkey hooks."""
-        import keyboard
+        """Register keyboard hook and start background monitors."""
+        with self._lock:
+            if self._running:
+                return
+            self._running = True
+            self._pressed_keys = set()
+            self._hold_pressed = False
+            self._toggle_pressed = False
+            self._toggle_recording = False
 
-        self._running = True
-        self._register_hooks()
+            # Hook keyboard events
+            import keyboard
+            try:
+                self._hook = keyboard.hook(self._on_key_event, suppress=False)
+            except Exception as e:
+                print(f"[Hotkey] Initial hook failed: {e}")
+
+            # Start background watchdog & power monitors
+            self._start_watchdog()
+            try:
+                self._power_monitor = PowerMonitor(self._on_wake_detected)
+                self._power_monitor.start()
+            except Exception as e:
+                print(f"[Hotkey] Failed to start power monitor: {e}")
 
     def stop(self):
-        """Unregister all hotkey hooks."""
-        import keyboard
+        """Unregister hook and stop background monitors."""
+        with self._lock:
+            self._running = False
 
-        self._running = False
-        for hook in self._hooks:
-            try:
-                keyboard.unhook(hook)
-            except Exception:
-                pass
-        self._hooks = []
-        self._toggle_recording = False
-        self._hold_pressed = False
+            # Stop watchdog
+            self._stop_watchdog()
+
+            # Stop power monitor
+            if self._power_monitor:
+                try:
+                    self._power_monitor.stop()
+                except Exception:
+                    pass
+                self._power_monitor = None
+
+            # Unhook keyboard listener
+            if self._hook:
+                import keyboard
+                try:
+                    keyboard.unhook(self._hook)
+                except Exception:
+                    pass
+                self._hook = None
+
+            self._pressed_keys = set()
+            self._hold_pressed = False
+            self._toggle_pressed = False
+            self._toggle_recording = False
 
     def update_combos(self, hold_combo: str, toggle_combo: str, mode: str):
-        """Update hotkey combos and mode. Re-registers hooks."""
-        was_running = self._running
+        """Update hotkey settings and trigger hotkey re-registration."""
+        was_running = False
+        with self._lock:
+            was_running = self._running
+
         if was_running:
             self.stop()
+
         self.hold_combo = hold_combo
         self.toggle_combo = toggle_combo
         self.mode = mode
+
         if was_running:
             self.start()
 
-    def _register_hooks(self):
-        """Set up keyboard hooks for the current mode."""
+    def _start_watchdog(self):
+        """Set up the 30-second watchdog timer to refresh hooks."""
+        self._stop_watchdog()
+        if self._running:
+            self._watchdog = threading.Timer(30.0, self._reregister)
+            self._watchdog.daemon = True
+            self._watchdog.start()
+
+    def _stop_watchdog(self):
+        """Cancel the watchdog timer."""
+        if self._watchdog:
+            self._watchdog.cancel()
+            self._watchdog = None
+
+    def _reregister(self):
+        """Safely re-hook to bypass Windows hook invalidations/timeouts."""
+        with self._lock:
+            if not self._running:
+                return
+
+            import keyboard
+            if self._hook:
+                try:
+                    keyboard.unhook(self._hook)
+                except Exception:
+                    pass
+                self._hook = None
+
+            try:
+                self._hook = keyboard.hook(self._on_key_event, suppress=False)
+            except Exception as e:
+                print(f"[Hotkey] Hook re-registration failed: {e}")
+
+            # Restart watchdog
+            self._start_watchdog()
+
+    def _on_wake_detected(self):
+        """Immediately re-register hook 1.5 seconds after Windows resumes from sleep."""
+        print("[Hotkey] System wake detected. Re-registering hook...")
+        time.sleep(1.5)
+        self._reregister()
+
+    def is_combo_active(self, combo_set: set[str]) -> bool:
+        """Verify if all keys in a combo are physically pressed using cache & direct state."""
+        if not combo_set:
+            return False
         import keyboard
+        for k in combo_set:
+            variations = get_key_variations(k)
+            # Check cached press event states
+            pressed = any(v in self._pressed_keys for v in variations)
+            if not pressed:
+                # System query fallback
+                pressed = any(keyboard.is_pressed(v) for v in variations if v)
+            if not pressed:
+                return False
+        return True
 
-        if self.mode == "hold":
-            # Hold mode: record while keys are held, stop on release
-            hook = keyboard.on_press_key(
-                self.hold_combo.split("+")[-1].strip(),
-                self._on_hold_press,
-                suppress=False,
-            )
-            self._hooks.append(hook)
+    def _on_key_event(self, event):
+        """Track down/up events and process state-machine transitions."""
+        if not self._running or not event.name:
+            return
 
-            # Use add_hotkey for the full combo
-            keyboard.add_hotkey(
-                self.hold_combo,
-                self._on_hold_start,
-                suppress=False,
-                trigger_on_release=False,
-            )
+        key_name = event.name.lower()
 
-            # Detect release of any key in the combo
-            for key in self.hold_combo.split("+"):
-                key = key.strip()
-                hook = keyboard.on_release_key(
-                    key,
-                    self._on_hold_release,
-                    suppress=False,
-                )
-                self._hooks.append(hook)
-
-        elif self.mode == "toggle":
-            # Toggle mode: press combo to start, press again to stop
-            keyboard.add_hotkey(
-                self.toggle_combo,
-                self._on_toggle,
-                suppress=False,
-                trigger_on_release=False,
-            )
-
-    def _on_hold_start(self):
-        """Called when hold combo is pressed."""
         with self._lock:
-            if self._hold_pressed:
-                # Double-tap: cancel recording
-                self._hold_pressed = False
-                if self.on_stop:
-                    self.on_stop()
-                return
+            if event.event_type == "down":
+                self._pressed_keys.add(key_name)
+            else:
+                self._pressed_keys.discard(key_name)
 
-            self._hold_pressed = True
+            # Extract keys
+            hold_set = {k.strip().lower() for k in self.hold_combo.split("+")}
+            toggle_set = {k.strip().lower() for k in self.toggle_combo.split("+")}
 
-        if self.on_start:
-            self.on_start()
+            hold_active = self.is_combo_active(hold_set)
+            toggle_active = self.is_combo_active(toggle_set)
 
-    def _on_hold_press(self, event):
-        """Track key press for hold mode."""
-        pass  # Handled by add_hotkey
+            if self.mode == "hold":
+                if hold_active:
+                    if not self._hold_pressed:
+                        self._hold_pressed = True
+                        if self.on_start:
+                            self.on_start()
+                else:
+                    if self._hold_pressed:
+                        self._hold_pressed = False
+                        if self.on_stop:
+                            self.on_stop()
 
-    def _on_hold_release(self, event):
-        """Called when any key in the hold combo is released."""
-        with self._lock:
-            if not self._hold_pressed:
-                return
-            self._hold_pressed = False
-
-        if self.on_stop:
-            self.on_stop()
-
-    def _on_toggle(self):
-        """Called when toggle combo is pressed."""
-        with self._lock:
-            self._toggle_recording = not self._toggle_recording
-            is_recording = self._toggle_recording
-
-        if is_recording:
-            if self.on_start:
-                self.on_start()
-        else:
-            if self.on_stop:
-                self.on_stop()
+            elif self.mode == "toggle":
+                if toggle_active:
+                    if not self._toggle_pressed:
+                        self._toggle_pressed = True
+                        self._toggle_recording = not self._toggle_recording
+                        if self._toggle_recording:
+                            if self.on_start:
+                                self.on_start()
+                        else:
+                            if self.on_stop:
+                                self.on_stop()
+                else:
+                    self._toggle_pressed = False
 
 
 class HotkeyRecorder:
     """
-    Records a hotkey combo from the user.
-    Used in the settings UI for custom hotkey assignment.
+    Records a custom hotkey combo from the settings UI.
     """
 
     def __init__(self):
@@ -299,11 +491,7 @@ class HotkeyRecorder:
         return self._recording
 
     def start(self, on_complete=None, on_update=None):
-        """
-        Start recording a hotkey combo.
-        on_complete(combo_str): called when combo is finalized.
-        on_update(display_str): called on each key change for live display.
-        """
+        """Start listening to keyboard inputs for the custom combo."""
         import keyboard
 
         self._pressed_keys = set()
@@ -315,7 +503,7 @@ class HotkeyRecorder:
         self._hook = keyboard.hook(self._on_key_event, suppress=True)
 
     def stop(self):
-        """Stop recording."""
+        """Unregister recorder listener."""
         import keyboard
 
         self._recording = False
@@ -327,24 +515,26 @@ class HotkeyRecorder:
             self._hook = None
 
     def cancel(self):
-        """Cancel recording without saving."""
+        """Cancel recording."""
         self.stop()
         self._combo = ""
 
     def _on_key_event(self, event):
         """Process keyboard events during recording."""
-        import keyboard as kb
-
         if event.name == "escape":
             self.cancel()
             if self._on_complete:
-                self._on_complete(None)  # None = cancelled
+                self._on_complete(None)
+            return
+
+        key_name = event.name.lower() if event.name else ""
+        if not key_name:
             return
 
         if event.event_type == "down":
-            self._pressed_keys.add(event.name.lower())
+            self._pressed_keys.add(key_name)
 
-            # Build display string
+            # Build display sequence
             mods = sorted(
                 [k for k in self._pressed_keys if k in MODIFIERS],
                 key=lambda x: ("ctrl" in x, "alt" in x, "shift" in x, "win" in x),
@@ -357,7 +547,7 @@ class HotkeyRecorder:
             if self._on_update:
                 self._on_update(display)
 
-            # If we have a modifier + a non-modifier key, finalize
+            # Complete registration if we have modifier + non-modifier
             has_mod = any(k in MODIFIERS for k in self._pressed_keys)
             has_non_mod = any(k not in MODIFIERS for k in self._pressed_keys)
 
@@ -368,13 +558,10 @@ class HotkeyRecorder:
                     self._on_complete(self._combo)
 
         elif event.event_type == "up":
-            key = event.name.lower()
-
-            # If only modifiers are held and one is released, finalize with modifiers only
-            if key in self._pressed_keys:
+            if key_name in self._pressed_keys:
                 has_non_mod = any(k not in MODIFIERS for k in self._pressed_keys)
                 if not has_non_mod and len(self._pressed_keys) >= 2:
-                    # All modifiers — finalize when one is released
+                    # Finalize when modifier is released
                     all_mods = all(k in MODIFIERS for k in self._pressed_keys)
                     if all_mods:
                         self._combo = "+".join(sorted(self._pressed_keys))
@@ -383,4 +570,4 @@ class HotkeyRecorder:
                             self._on_complete(self._combo)
                         return
 
-                self._pressed_keys.discard(key)
+                self._pressed_keys.discard(key_name)
