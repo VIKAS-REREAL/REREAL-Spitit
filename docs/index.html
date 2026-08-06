@@ -34,7 +34,7 @@
         <a href="guide.html" class="nav-tab">Guide</a>
       </div>
     </div>
-    <a href="#download" class="nav-cta" id="nav-dl">Download for free</a>
+    <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit/releases" class="nav-cta" id="nav-dl">Download for free</a>
   </nav>
 
   <!-- ══════════════════════════════════
@@ -47,7 +47,7 @@
       <div class="tag">REREAL · Spitit &dash; Beta Version</div>
       <h1 class="hero-title">Don't type,<br><em>just speak.</em></h1>
       <p class="hero-sub">The voice-to-text AI that turns speech into clear, polished writing in every app.</p>
-      <a href="#download" class="btn-download" id="hero-dl">Download for free</a>
+      <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit/releases" class="btn-download" id="hero-dl">Download for free</a>
       <p class="hero-note">Free &middot; Windows 10 &amp; 11 &middot; No account needed</p>
     </div>
 
@@ -385,7 +385,7 @@
           <span class="footer-logo-name">Spitit</span>
         </a>
         <p class="footer-tagline">The voice-to-text AI that turns speech into clear, polished writing — in every app.</p>
-        <a href="#" id="dl-btn" class="footer-cta">Download for free</a>
+        <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit/releases" id="dl-btn" class="footer-cta">Download for free</a>
       </div>
 
       <!-- Product column -->
@@ -429,22 +429,6 @@
       pillTxt.textContent = pillStates[si].text;
       pillBars.forEach(b => b.style.background = pillStates[si].color);
     }, 2800);
-
-    // GitHub release links
-    (async () => {
-      try {
-        const d = await (await fetch('https://api.github.com/repos/VIKAS-REREAL/REREAL-Spitit/releases/latest')).json();
-        const asset = (d.assets || []).find(a => a.name.includes('Setup') && a.name.endsWith('.exe'))
-          || (d.assets || []).find(a => a.name.endsWith('.exe'));
-        if (asset) {
-          const url = asset.browser_download_url;
-          ['hero-dl', 'nav-dl', 'dl-btn'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.href = url;
-          });
-        }
-      } catch (_) { }
-    })();
   </script>
 
 </body>
