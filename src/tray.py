@@ -112,10 +112,7 @@ class TrayManager:
         # Try to load from assets
         try:
             from src.config import get_asset_path
-            if sys.platform == "win32":
-                icon_path = get_asset_path("icon.ico")
-            else:
-                icon_path = get_asset_path("icon.png")
+            icon_path = get_asset_path("icon.png")
             if icon_path.exists():
                 return Image.open(icon_path).resize((64, 64))
         except Exception:

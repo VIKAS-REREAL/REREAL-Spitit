@@ -59,10 +59,12 @@ class VoiceFlowApp:
 
         # Try to set icon on root
         try:
+            import tkinter as tk
             from src.config import get_asset_path
-            ico_path = get_asset_path("icon.ico")
-            if ico_path.exists():
-                self._root.iconbitmap(str(ico_path))
+            png_path = get_asset_path("icon.png")
+            if png_path.exists():
+                icon_img = tk.PhotoImage(file=str(png_path))
+                self._root.iconphoto(False, icon_img)
         except Exception:
             pass
 
