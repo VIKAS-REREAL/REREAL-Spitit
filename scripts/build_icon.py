@@ -1,6 +1,11 @@
 """
 REREAL - Spitit: Icon generator.
-Parses the custom SVG icon at docs/icon.svg and renders it as a 512×512 PNG and a multi-resolution ICO.
+Reads assets/icon.svg (the full-quality brand icon with gradients/filters)
+and renders it as a multi-resolution PNG and ICO for the app, installer,
+and docs pages.
+
+Preferred renderer: cairosvg (pip install cairosvg)
+Fallback renderer: PIL rect-parser (no external deps)
 """
 
 import os
@@ -8,90 +13,121 @@ import sys
 import re
 from pathlib import Path
 
+
 def get_project_root():
     """Get the project root directory."""
     return Path(__file__).parent.parent
 
 
-def generate_icon():
-    """Generate the app icon as PNG and ICO by parsing docs/icon.svg."""
+def _try_cairosvg(svg_path: Path, size: int):
+    """Try rendering SVG with cairosvg. Returns PIL Image or None."""
+    try:
+        import cairosvg
+        from PIL import Image
+        import io
+        png_bytes = cairosvg.svg2png(
+            url=str(svg_path),
+            output_width=size,
+            output_height=size,
+        )
+        return Image.open(io.BytesIO(png_bytes)).convert("RGBA")
+    except ImportError:
+        return None
+    except Exception as e:
+        print(f"[Warning] cairosvg render failed: {e}")
+        return None
+
+
+def _render_with_pil(svg_path: Path, size: int):
+    """Fallback: parse <rect> elements and draw with PIL."""
     from PIL import Image, ImageDraw
 
-    root = get_project_root()
-    svg_path = root / "docs" / "icon.svg"
-    
-    if not svg_path.exists():
-        print(f"[Error] Custom icon SVG not found at {svg_path}")
-        return
-
-    with open(svg_path, "r") as f:
+    with open(svg_path, "r", encoding="utf-8") as f:
         svg_content = f.read()
 
-    # Find all <rect ... /> elements
-    rect_matches = re.findall(r'<rect\s+([^>]+)/>', svg_content)
-    
-    # Scale from 600x600 down to 512x512
-    size = 512
-    scale = size / 600.0
+    # Detect viewBox width/height for scale
+    vb_match = re.search(r'viewBox=["\']\s*\S+\s+\S+\s+(\S+)\s+(\S+)', svg_content)
+    src_w = float(vb_match.group(1)) if vb_match else 600.0
+    src_h = float(vb_match.group(2)) if vb_match else 600.0
+    scale = size / max(src_w, src_h)
 
     img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
 
+    rect_matches = re.findall(r'<rect\s+([^>]+)/>', svg_content)
     for rect in rect_matches:
         def get_attr(name, default="0"):
-            m = re.search(fr'{name}="([^"]+)"', rect)
+            m = re.search(fr'{name}=["\']([^"\']+)', rect)
             return m.group(1) if m else default
 
         x = float(get_attr("x", "0"))
         y = float(get_attr("y", "0"))
-        w = float(get_attr("width", "600"))
-        h = float(get_attr("height", "600"))
+        w = float(get_attr("width", str(src_w)))
+        h = float(get_attr("height", str(src_h)))
         rx = float(get_attr("rx", "0"))
         fill = get_attr("fill", "black")
 
-        x1 = x * scale
-        y1 = y * scale
-        x2 = (x + w) * scale
-        y2 = (y + h) * scale
-        r = rx * scale
+        # Parse gradient references — use first gradient stop color
+        if fill.startswith("url("):
+            grad_id = re.search(r'url\(#([^)]+)\)', fill)
+            if grad_id:
+                gid = grad_id.group(1)
+                stop = re.search(rf'id="{gid}".*?stop-color=["\']([^"\']+)', svg_content, re.DOTALL)
+                fill = stop.group(1) if stop else "#FFD505"
+            else:
+                fill = "#FFD505"
 
-        draw.rounded_rectangle([x1, y1, x2, y2], radius=r, fill=fill)
+        draw.rounded_rectangle(
+            [x * scale, y * scale, (x + w) * scale, (y + h) * scale],
+            radius=rx * scale,
+            fill=fill,
+        )
 
-    # Save to assets/icon.png and assets/icon.ico
+    return img
+
+
+def generate_icon():
+    """Generate the app icon from assets/icon.svg (the authoritative brand icon)."""
+    root = get_project_root()
+    # SOURCE: assets/icon.svg is the master (richer gradient version)
+    svg_path = root / "assets" / "icon.svg"
+
+    if not svg_path.exists():
+        print(f"[Error] Source icon not found: {svg_path}")
+        sys.exit(1)
+
+    print(f"[*] Rendering from {svg_path}")
+    size = 512
+
+    img = _try_cairosvg(svg_path, size)
+    if img is None:
+        print("[*] cairosvg not available, using PIL rect fallback")
+        img = _render_with_pil(svg_path, size)
+
     assets_dir = root / "assets"
     assets_dir.mkdir(parents=True, exist_ok=True)
-
-    png_path = assets_dir / "icon.png"
-    img.save(str(png_path), "PNG")
-    print(f"[OK] Saved assets PNG: {png_path}")
+    docs_dir = root / "docs"
 
     ico_sizes = [16, 32, 48, 64, 128, 256]
+
+    # Save assets/icon.png and assets/icon.ico
+    png_path = assets_dir / "icon.png"
+    img.save(str(png_path), "PNG")
+    print(f"[OK] Saved: {png_path}")
+
     ico_path = assets_dir / "icon.ico"
-    img.save(
-        str(ico_path),
-        format="ICO",
-        sizes=[(s, s) for s in ico_sizes],
-    )
-    print(f"[OK] Saved assets ICO: {ico_path}")
+    img.save(str(ico_path), format="ICO", sizes=[(s, s) for s in ico_sizes])
+    print(f"[OK] Saved: {ico_path}")
 
-    # Copy to assets/icon.svg
-    import shutil
-    try:
-        shutil.copy(str(svg_path), str(assets_dir / "icon.svg"))
-        print(f"[OK] Copied custom SVG to: {assets_dir / 'icon.svg'}")
-    except Exception as e:
-        print(f"[Warning] Failed to copy custom SVG to assets: {e}")
-
-    # Save copies directly to docs/icon.png and docs/icon.ico
-    docs_dir = root / "docs"
+    # Mirror to docs/ for the web page
     img.save(str(docs_dir / "icon.png"), "PNG")
-    print(f"[OK] Saved docs PNG: {docs_dir / 'icon.png'}")
-    img.save(
-        str(docs_dir / "icon.ico"),
-        format="ICO",
-        sizes=[(s, s) for s in ico_sizes],
-    )
-    print(f"[OK] Saved docs ICO: {docs_dir / 'icon.ico'}")
+    img.save(str(docs_dir / "icon.ico"), format="ICO", sizes=[(s, s) for s in ico_sizes])
+    print(f"[OK] Saved copies to docs/")
+
+    # docs/icon.svg — copy the same SVG so the web page nav shows the richer icon
+    import shutil
+    shutil.copy(str(svg_path), str(docs_dir / "icon.svg"))
+    print(f"[OK] Copied assets/icon.svg → docs/icon.svg")
 
 
 if __name__ == "__main__":

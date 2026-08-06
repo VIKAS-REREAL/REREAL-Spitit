@@ -1,391 +1,452 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="REREAL - Spitit: The fastest voice-to-text for Windows. Powered by Groq Whisper. No login. No cloud. Just speak.">
-    <meta name="keywords" content="voice to text, speech recognition, Windows, Groq, Whisper, transcription, Hinglish">
-    <meta name="author" content="REREAL">
-    
-    <!-- Open Graph -->
-    <meta property="og:title" content="REREAL - Spitit | Voice to Text for Windows">
-    <meta property="og:description" content="The fastest voice-to-text for Windows. Powered by Groq Whisper. No login. No cloud. Just speak.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://vikas-rereal.github.io/REREAL-Spitit/">
-    
-    <title>REREAL - Spitit | Speak. Release. Done.</title>
-    
-    <!-- Favicons -->
-    <link rel="icon" type="image/x-icon" href="icon.ico">
-    <link rel="icon" type="image/png" href="icon.png">
-    <link rel="icon" type="image/svg+xml" href="icon.svg">
-    
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <link rel="stylesheet" href="style.css">
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="REREAL Spitit — Sub-second voice-to-text for Windows. Hold, speak, release. Done.">
+  <title>REREAL · Spitit | Voice to Text</title>
+  <link rel="icon" href="icon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Figtree:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <!-- Animated background orbs -->
-    <div class="bg-orbs">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
+
+  <!-- ══════════════════════════════════
+       NAV — Logo image + tabs + yellow CTA
+  ══════════════════════════════════ -->
+  <nav class="nav">
+    <div class="nav-left">
+      <!-- Logo mark (icon.svg inline) + wordmark -->
+      <!-- Use icon.svg file directly — much cleaner -->
+      <a href="/" class="nav-logo">
+        <img src="icon.svg" class="nav-logo-img" alt="Spitit" width="32" height="32">
+        <span class="nav-logo-wordmark">Spitit</span>
+      </a>
+      <div class="nav-divider"></div>
+      <div class="nav-tabs">
+        <a href="/" class="nav-tab active">Dictation</a>
+        <a href="guide.html" class="nav-tab">Guide</a>
+      </div>
+    </div>
+    <a href="#download" class="nav-cta" id="nav-dl">Download for free</a>
+  </nav>
+
+  <!-- ══════════════════════════════════
+       HERO
+  ══════════════════════════════════ -->
+  <section class="hero">
+    <div class="hero-spacer"></div>
+
+    <div class="hero-content">
+      <div class="tag">REREAL · Spitit &dash; Beta Version</div>
+      <h1 class="hero-title">Don't type,<br><em>just speak.</em></h1>
+      <p class="hero-sub">The voice-to-text AI that turns speech into clear, polished writing in every app.</p>
+      <a href="#download" class="btn-download" id="hero-dl">Download for free</a>
+      <p class="hero-note">Free &middot; Windows 10 &amp; 11 &middot; No account needed</p>
     </div>
 
-    <!-- Hero Section -->
-    <section class="hero" id="hero">
-        <div class="container">
-            <div class="hero-badge">
-                <span class="badge-dot"></span>
-                <span>Open Source & Free</span>
-            </div>
-            
-            <h1 class="hero-title">
-                <span class="brand-re">RE</span><span class="brand-real">REAL</span>
-                <span class="brand-sep">·</span>
-                <span class="brand-spitit">Spitit</span>
-            </h1>
-            
-            <p class="hero-tagline">Speak. Release. Done.</p>
-            
-            <p class="hero-desc">
-                The fastest voice-to-text for Windows.<br>
-                Powered by Groq Whisper. No login. No cloud. Just speak.
-            </p>
-            
-            <div class="hero-buttons">
-                <a href="#" class="btn btn-primary" id="hero-installer-btn">
-                    <i data-lucide="download" class="btn-icon-svg"></i>
-                    Download Installer
-                </a>
-                <a href="#" class="btn btn-ghost" id="hero-portable-btn">
-                    <i data-lucide="download" class="btn-icon-svg"></i>
-                    Download Portable
-                </a>
-                <a href="guide.html" class="btn btn-ghost btn-guide">
-                    <i data-lucide="book-open" class="btn-icon-svg"></i>
-                    Interactive Guide
-                </a>
-            </div>
+    <!-- SVG text flows — left wavy audio curve leveling into pill, right ribbon exiting straight out of pill -->
+    <div class="hero-animation-wrap">
 
-            <!-- Animated pill demo -->
-            <div class="pill-demo">
-                <div class="pill-container" id="pill-demo-container">
-                    <div class="sim-pill visible recording" id="pill-demo" style="position: relative; bottom: auto; right: auto; margin: 0 auto; overflow: hidden;">
-                        <!-- Fluid Wave Canvas (Recording) -->
-                        <div class="sim-wave-canvas">
-                            <svg class="sim-wave-svg" viewBox="0 0 120 34" xmlns="http://www.w3.org/2000/svg">
-                                <path class="sim-wave-path sim-wave-1" d="M 0 17 Q 30 9, 60 17 T 120 17 Q 150 25, 180 17 T 240 17 Q 270 9, 300 17 T 360 17" fill="none" stroke="#FFD505" stroke-width="2"/>
-                                <path class="sim-wave-path sim-wave-2" d="M 0 17 Q 30 25, 60 17 T 120 17 Q 150 9, 180 17 T 240 17 Q 270 25, 300 17 T 360 17" fill="none" stroke="#FFD505" stroke-width="2"/>
-                                <path class="sim-wave-path sim-wave-3" d="M 0 17 Q 15 5, 30 17 T 60 17 Q 75 29, 90 17 T 120 17 Q 135 5, 150 17 T 180 17 Q 195 29, 210 17 T 240 17 Q 255 5, 270 17 T 300 17" fill="none" stroke="#FFD505" stroke-width="1.5" opacity="0.7"/>
-                            </svg>
-                        </div>
-                        <!-- Transcribing Spinner (Transcribing) -->
-                        <div class="sim-spinner"></div>
-                        <!-- Done Checkmark (Done) -->
-                        <div class="sim-done">
-                            <i data-lucide="check"></i> 12 words
-                        </div>
-                        <!-- Progress bar at bottom of pill -->
-                        <div class="sim-progress-bar">
-                            <div class="sim-progress-fill" id="pill-demo-progress" style="width: 0%;"></div>
-                        </div>
-                    </div>
-                    <div class="pill-label" id="pill-demo-label" style="margin-top: 8px;">Recording...</div>
-                </div>
-            </div>
+      <!-- LEFT SVG: raw speech text rides along a wavy audio soundwave path, leveling smoothly into the left side of the pill -->
+      <svg class="hero-svg hero-svg-left" viewBox="0 0 1400 320" fill="none" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <!-- Gentle soundwave: small amplitude ±20px so text stays nearly horizontal -->
+        <path id="curve-left"
+          d="M -50 160 C 120 140, 220 180, 340 145 C 460 120, 560 175, 680 160 L 710 160"
+          stroke="none" fill="none"/>
+        <text fill="#1A1A1A" opacity="0.55" font-family="Figtree, sans-serif" font-size="15" font-weight="500" letter-spacing="0.01em">
+          <textPath xlink:href="#curve-left" startOffset="-100%">
+            Umm, hope your week has started well… I was talking to the team earlier but reception was really bad and I think we're gonna handle the first part of the sprint but I'm not totally sure. Also I told everyone the timeline should be ready by Friday, although it's probably going to slip. There's been a lot of back and forth and honestly the whole thing's been kind of chaotic, like nobody really knows what's going on, so can you check if the notes from yesterday's meeting were sent out? Umm, hope your week has started well…
+            <animate attributeName="startOffset" dur="28s" values="-100%; 0%" repeatCount="indefinite"/>
+          </textPath>
+        </text>
+      </svg>
+
+      <!-- PILL — fixed at center of animation area -->
+      <div class="pill-center">
+        <div class="the-pill" id="the-pill">
+          <div class="pill-bars">
+            <div class="pill-bar"></div>
+            <div class="pill-bar"></div>
+            <div class="pill-bar"></div>
+            <div class="pill-bar"></div>
+            <div class="pill-bar"></div>
+            <div class="pill-bar"></div>
+            <div class="pill-bar"></div>
+            <div class="pill-bar"></div>
+            <div class="pill-bar"></div>
+            <div class="pill-bar"></div>
+          </div>
+          <span class="pill-text" id="pill-txt">Recording</span>
         </div>
+        <div class="pill-hotkey">Hold <kbd>Alt</kbd> + <kbd>LShift</kbd></div>
+      </div>
+
+      <!-- RIGHT SVG: ribbon exits pill 100% straight horizontal, perfectly aligned with pill height -->
+      <svg class="hero-svg hero-svg-right" viewBox="0 0 1400 320" fill="none" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <path id="curve-right"
+          d="M 690 160 L 800 160 C 920 160, 1020 230, 1160 230 C 1300 230, 1380 160, 1500 160"
+          stroke="#111111" stroke-width="36" stroke-linecap="round" fill="none"/>
+        <text dy="5.5" fill="#FFFFEB" font-family="Figtree, sans-serif" font-size="15" font-weight="600">
+          <textPath xlink:href="#curve-right" startOffset="-100%">
+            Hope your week is off to a great start. I was talking with the team — reception was a bit spotty, but they’ll handle the first part of the sprint. The new timeline should be ready by Friday, though it might slip slightly. Can you follow up and confirm that yesterday’s meeting notes were distributed? Hope your week is off to a great start.
+            <animate attributeName="startOffset" dur="35s" values="-100%; 0%" repeatCount="indefinite"/>
+          </textPath>
+        </text>
+      </svg>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       LOGO TICKER
+  ══════════════════════════════════ -->
+  <section class="logos-section">
+    <p class="logos-label">Works in every app</p>
+    <div class="marquee-wrap">
+      <div class="marquee-track">
+        <div class="logo-item"><span>VS Code</span></div>
+        <div class="logo-item"><span>Cursor</span></div>
+        <div class="logo-item"><span>Notion</span></div>
+        <div class="logo-item"><span>Slack</span></div>
+        <div class="logo-item"><span>Gmail</span></div>
+        <div class="logo-item"><span>Outlook</span></div>
+        <div class="logo-item"><span>Obsidian</span></div>
+        <div class="logo-item"><span>WhatsApp</span></div>
+        <div class="logo-item"><span>ChatGPT</span></div>
+        <div class="logo-item"><span>Claude</span></div>
+        <div class="logo-item"><span>Linear</span></div>
+        <div class="logo-item"><span>Figma</span></div>
+        <!-- Duplicate for loop -->
+        <div class="logo-item"><span>VS Code</span></div>
+        <div class="logo-item"><span>Cursor</span></div>
+        <div class="logo-item"><span>Notion</span></div>
+        <div class="logo-item"><span>Slack</span></div>
+        <div class="logo-item"><span>Gmail</span></div>
+        <div class="logo-item"><span>Outlook</span></div>
+        <div class="logo-item"><span>Obsidian</span></div>
+        <div class="logo-item"><span>WhatsApp</span></div>
+        <div class="logo-item"><span>ChatGPT</span></div>
+        <div class="logo-item"><span>Claude</span></div>
+        <div class="logo-item"><span>Linear</span></div>
+        <div class="logo-item"><span>Figma</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       SPEED SECTION (dark)
+  ══════════════════════════════════ -->
+  <div class="speed-section-wrap">
+    <section class="speed-section">
+      <div class="speed-inner">
+        <p class="speed-label">Performance</p>
+        <h2 class="speed-title">
+          <span class="accent">Sub-second</span> speed,<br><em>every time.</em>
+        </h2>
+        <p class="speed-sub">
+          Groq's LPU runs Whisper Large-v3 Turbo. From hotkey release to text in your window — ~350ms. Not a round
+          number. We measured it.
+        </p>
+
+        <div class="speed-cards">
+          <div class="sp-card kb">
+            <p class="sp-lbl">Typing</p>
+            <p class="sp-name">Keyboard</p>
+            <p class="sp-num">45 <span class="sp-unit">wpm</span></p>
+            <div class="sp-wave">
+              <svg width="100%" height="40" viewBox="0 0 500 40" xmlns="http://www.w3.org/2000/svg">
+                <path id="sp-line-kb" d="M0 22 H1000" fill="none" />
+                <text x="0">
+                  <textPath href="#sp-line-kb">I'm typing this out slowly, one key at a time…&nbsp;&nbsp;I'm typing this
+                    out slowly, one key at a time…&nbsp;&nbsp;</textPath>
+                  <animate attributeName="x" dur="14s" values="0;-500" repeatCount="indefinite" />
+                </text>
+                <style>
+                  #sp-line-kb {
+                    fill: transparent
+                  }
+
+                  #sp-line-kb+text textPath {
+                    font-family: 'Figtree', sans-serif;
+                    font-size: 12px;
+                    font-weight: 600;
+                    fill: rgba(255, 255, 235, 0.25)
+                  }
+                </style>
+              </svg>
+            </div>
+          </div>
+          <div class="sp-vs"><em>vs</em></div>
+          <div class="sp-card spitit">
+            <p class="sp-lbl">Spitit</p>
+            <p class="sp-name">Voice</p>
+            <p class="sp-num">220 <span class="sp-unit">wpm</span></p>
+            <div class="sp-wave">
+              <svg width="100%" height="40" viewBox="0 0 500 40" xmlns="http://www.w3.org/2000/svg">
+                <path id="sp-wave-s"
+                  d="M0 28 C80 8,160 38,240 22 C320 6,400 38,480 22 C560 6,640 38,720 22 C800 6,880 38,960 22 C1040 6,1120 38,1200 22"
+                  fill="none" />
+                <text x="0">
+                  <textPath href="#sp-wave-s">Speaking naturally at the speed of thought — transcribed
+                    instantly.&nbsp;&nbsp;&nbsp;Speaking naturally at the speed of thought…</textPath>
+                  <animate attributeName="x" dur="7s" values="0;-500" repeatCount="indefinite" />
+                </text>
+                <style>
+                  #sp-wave-s {
+                    fill: transparent
+                  }
+
+                  #sp-wave-s+text textPath {
+                    font-family: 'Figtree', sans-serif;
+                    font-size: 12px;
+                    font-weight: 600;
+                    fill: rgba(255, 213, 5, 0.85)
+                  }
+                </style>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
+  </div>
 
-    <!-- Features Section -->
-    <section class="features" id="features">
-        <div class="container">
-            <h2 class="section-title">Built for Speed & Privacy</h2>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon"><i data-lucide="zap"></i></div>
-                    <h3>Groq Whisper Speed</h3>
-                    <p>Transcription in under a second. Groq's LPU inference makes real-time voice-to-text feel instant.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon"><i data-lucide="globe"></i></div>
-                    <h3>Hinglish Support</h3>
-                    <p>Speak Hindi, type in Roman script. Perfect for Indian users who think in Hindi but type in English.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon"><i data-lucide="keyboard"></i></div>
-                    <h3>Custom Hotkeys</h3>
-                    <p>Record any key combo that works for you. Hold-to-talk or toggle mode — your workflow, your rules.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon"><i data-lucide="target"></i></div>
-                    <h3>Smart Auto-Paste</h3>
-                    <p>Transcription appears exactly where you're typing. No copy-paste needed — it just works.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon"><i data-lucide="bell-off"></i></div>
-                    <h3>System Tray</h3>
-                    <p>Lives quietly in your system tray. Zero screen clutter. A tiny floating pill shows state — that's it.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon"><i data-lucide="shield-check"></i></div>
-                    <h3>100% Private</h3>
-                    <p>Your audio goes directly to Groq's API — never through our servers. No telemetry. No tracking. Zero.</p>
-                </div>
-            </div>
+  <!-- ══════════════════════════════════
+       FEATURES — SVG icons, no emojis
+  ══════════════════════════════════ -->
+  <section class="features-section" id="features">
+    <div class="section-header">
+      <p class="section-tag">Features</p>
+      <h2 class="section-title">Everything you need,<br><em>nothing you don't.</em></h2>
+    </div>
+
+    <div class="features-grid">
+
+      <div class="feat-card">
+        <div class="feat-icon">
+          <!-- Zap icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+          </svg>
         </div>
-    </section>
+        <h3 class="feat-title">Sub-second<br><em>transcription</em></h3>
+        <p class="feat-body">Groq's LPU inference means ~350ms from hotkey release to text on screen. No cloud roundtrip
+          delay. No waiting animation.</p>
+      </div>
 
-    <!-- How it Works Section -->
-    <section class="how-it-works" id="how-it-works">
-        <div class="container">
-            <h2 class="section-title">How It Works</h2>
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h3>Set your Groq API key</h3>
-                        <p>Get a free API key from <a href="https://console.groq.com" target="_blank" rel="noopener">console.groq.com</a> and paste it in Settings.</p>
-                    </div>
-                </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h3>Hold your hotkey and speak</h3>
-                        <p>Press and hold <kbd>Alt</kbd> + <kbd>LShift</kbd> (or your custom combo) and speak naturally.</p>
-                    </div>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h3>Transcription appears where you're typing</h3>
-                        <p>Release the hotkey. Your speech is transcribed in under a second and typed into your active window.</p>
-                    </div>
-                </div>
-            </div>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <!-- Layout icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <path d="M3 9h18M9 21V9" />
+          </svg>
         </div>
-    </section>
+        <h3 class="feat-title">Paste into<br><em>any app</em></h3>
+        <p class="feat-body">Whatever window has focus gets the text. Cursor, Notion, Gmail, Slack, VS Code, WhatsApp
+          Web — it just works.</p>
+      </div>
 
-    <!-- Download Section -->
-    <section class="download" id="download">
-        <div class="container">
-            <h2 class="section-title">Get REREAL - Spitit</h2>
-            
-            <div class="platform-badge">
-                <i data-lucide="monitor" class="platform-icon-svg"></i>
-                <span>Windows 10 / 11</span>
-            </div>
- 
-            <div class="download-cards">
-                <div class="download-card recommended" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                    <div class="download-tag">Recommended</div>
-                    <h3>Installer</h3>
-                    <p>Full setup wizard with desktop shortcut, Start Menu entry, and optional startup launch.</p>
-                    <a href="#" class="btn btn-primary btn-full" id="download-installer-btn">
-                        <i data-lucide="download" class="btn-icon-svg"></i> Download Installer
-                    </a>
-                    
-                    <!-- Older Versions Dropdown -->
-                    <div class="dropdown" style="margin-top: 12px; position: relative; width: 100%;">
-                        <button class="btn btn-ghost btn-full" id="older-versions-btn" style="display: flex; justify-content: space-between; align-items: center; width: 100%; border: 1px solid rgba(255, 213, 5, 0.25);">
-                            <span>Download Older Versions</span>
-                            <i data-lucide="chevron-down" class="chevron-icon" style="width: 16px; height: 16px; transition: transform 0.2s;"></i>
-                        </button>
-                        <div class="dropdown-content" id="older-versions-dropdown" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: rgba(26, 26, 36, 0.98); border: 1px solid rgba(255, 213, 5, 0.25); border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.6); z-index: 10; margin-top: 4px; overflow: hidden; padding: 4px 0;">
-                            <!-- Dynamically populated links -->
-                        </div>
-                    </div>
-                    
-                    <span class="download-size" style="margin-top: 12px;">~50 MB</span>
-                </div>
-                <div class="download-card" style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-                    <h3>Portable</h3>
-                    <p>Single .exe file. No installation needed. Run from anywhere — USB drive, desktop, whatever.</p>
-                    <a href="#" class="btn btn-ghost btn-full" id="download-portable-btn">
-                        <i data-lucide="download" class="btn-icon-svg"></i> Download Portable
-                    </a>
-                    <span class="download-size" style="margin-top: 12px;">~50 MB</span>
-                </div>
-            </div>
-
-            <div class="system-req">
-                <h4>System Requirements</h4>
-                <ul>
-                    <li>Windows 10 or 11 (64-bit)</li>
-                    <li>~50 MB disk space</li>
-                    <li>Internet connection (for transcription)</li>
-                    <li>A microphone</li>
-                </ul>
-            </div>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <!-- Shield icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
         </div>
-    </section>
+        <h3 class="feat-title">100% private,<br><em>zero middlemen</em></h3>
+        <p class="feat-body">Audio goes from your mic to Groq over encrypted TLS. No Spitit servers. No logging. No data
+          retention. Period.</p>
+      </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-brand">
-                <span class="brand-re">RE</span><span class="brand-real">REAL</span>
-            </div>
-            <p class="footer-tagline">Where real meets unreal</p>
-            
-            <div class="footer-links">
-                <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit" target="_blank" rel="noopener">GitHub</a>
-                <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a>
-                <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit/issues" target="_blank" rel="noopener">Issues</a>
-            </div>
-            
-            <p class="footer-copy">Built with ❤️ under REREAL — Where real meets unreal</p>
+      <div class="feat-card">
+        <div class="feat-icon">
+          <!-- Mic icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+            <line x1="12" y1="19" x2="12" y2="23" />
+            <line x1="8" y1="23" x2="16" y2="23" />
+          </svg>
         </div>
-    </footer>
+        <h3 class="feat-title">Hinglish<br><em>actually works</em></h3>
+        <p class="feat-body">"Meeting 6 baje start karte hain bhai" — comes out exactly like that, in Roman script,
+          correctly. Not transliterated garbage.</p>
+      </div>
 
-    <script>
-        // Pill demo animation: cycle through states
-        const pillDemo = document.getElementById('pill-demo');
-        const pillLabel = document.getElementById('pill-demo-label');
-        const progressFill = document.getElementById('pill-demo-progress');
-        const states = [
-            { cls: 'recording', label: 'Recording...' },
-            { cls: 'transcribing', label: 'Transcribing...' },
-            { cls: 'done', label: 'Done!' },
-        ];
-        let stateIdx = 0;
-        let progressVal = 0;
+      <div class="feat-card">
+        <div class="feat-icon">
+          <!-- Keyboard icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="6" width="20" height="12" rx="2" />
+            <path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8" />
+          </svg>
+        </div>
+        <h3 class="feat-title">Custom<br><em>hotkey</em></h3>
+        <p class="feat-body">Hold <kbd class="k">Alt</kbd> + <kbd class="k">LShift</kbd> to record. Change it to
+          anything. Toggle mode, hold mode — your workflow, your rules.</p>
+      </div>
 
-        // Progress bar simulation in recording state
-        setInterval(() => {
-            if (states[stateIdx].cls === 'recording') {
-                progressVal = (progressVal + 8) % 100;
-                progressFill.style.width = progressVal + '%';
-            }
-        }, 150);
-        
-        setInterval(() => {
-            stateIdx = (stateIdx + 1) % states.length;
-            
-            // Remove previous state classes and apply the new one
-            pillDemo.className = 'sim-pill visible ' + states[stateIdx].cls;
-            pillLabel.textContent = states[stateIdx].label;
-            
-            if (states[stateIdx].cls === 'recording') {
-                progressVal = 0;
-                progressFill.style.width = '0%';
-            }
-        }, 3000);
+      <div class="feat-card">
+        <div class="feat-icon">
+          <!-- Minimize icon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <polyline points="4 14 10 14 10 20" />
+            <polyline points="20 10 14 10 14 4" />
+            <line x1="10" y1="14" x2="21" y2="3" />
+            <line x1="3" y1="21" x2="14" y2="10" />
+          </svg>
+        </div>
+        <h3 class="feat-title">System tray,<br><em>zero distraction</em></h3>
+        <p class="feat-body">No window in your face. The only UI is the floating pill during recording — which vanishes
+          the instant transcription finishes.</p>
+      </div>
 
-        // Initialize Lucide Icons
-        lucide.createIcons();
+    </div>
+  </section>
 
-        // Older Versions Dropdown Event Handling
-        const toggleBtn = document.getElementById('older-versions-btn');
-        const dropdownContent = document.getElementById('older-versions-dropdown');
-        const chevron = toggleBtn.querySelector('.chevron-icon');
+  <!-- ══════════════════════════════════
+       HOW IT WORKS
+  ══════════════════════════════════ -->
+  <section class="how-section" id="how">
+    <div class="section-header">
+      <p class="section-tag">Getting started</p>
+      <h2 class="section-title">Three steps,<br><em>then it's yours.</em></h2>
+    </div>
+    <div class="steps-grid">
+      <div class="step-item">
+        <p class="step-num">Step 01</p>
+        <h3 class="step-title">Get a free<br><em>Groq API key</em></h3>
+        <p class="step-body">Visit <a href="https://console.groq.com" target="_blank"
+            style="text-decoration:underline;text-underline-offset:3px;">console.groq.com</a>. Sign up free. Copy your
+          API key. The free tier handles heavy daily use easily.</p>
+      </div>
+      <div class="step-item">
+        <p class="step-num">Step 02</p>
+        <h3 class="step-title">Download<br><em>and install</em></h3>
+        <p class="step-body">Run the installer. When prompted, paste your Groq API key. No terminal required. No Python.
+          Launches in system tray and stays there.</p>
+      </div>
+      <div class="step-item">
+        <p class="step-num">Step 03</p>
+        <h3 class="step-title">Hold, speak,<br><em>release.</em></h3>
+        <p class="step-body">Press <kbd class="k">Alt</kbd> + <kbd class="k">LShift</kbd> and speak. Release when done.
+          ~350ms later your words appear, clean, wherever your cursor was.</p>
+      </div>
+    </div>
+  </section>
 
-        toggleBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const isVisible = dropdownContent.style.display === 'block';
-            dropdownContent.style.display = isVisible ? 'none' : 'block';
-            chevron.style.transform = isVisible ? 'rotate(0deg)' : 'rotate(180deg)';
-        });
+  <!-- ══════════════════════════════════
+       DOWNLOAD CTA
+  ══════════════════════════════════ -->
+  <section class="cta-section" id="download">
+    <h2 class="cta-title">Start speaking.<br><em>Stop typing.</em></h2>
+    <p class="cta-sub">Free. Open source. No subscription. Windows 10 &amp; 11.</p>
+    <div>
+      <a href="#" class="btn-download" id="dl-btn" style="font-size:16px; padding:14px 36px;">
+        Download for free
+      </a>
+      <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit" target="_blank" class="btn-outline">
+        View on GitHub
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+          <polyline points="15 3 21 3 21 9" />
+          <line x1="10" y1="14" x2="21" y2="3" />
+        </svg>
+      </a>
+    </div>
+    <p class="cta-note">v2.0.1 &middot; MIT License &middot; Groq API key required (free tier available)</p>
+  </section>
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', () => {
-            dropdownContent.style.display = 'none';
-            chevron.style.transform = 'rotate(0deg)';
-        });
+  <!-- ══════════════════════════════════
+       FOOTER — Premium redesign
+  ══════════════════════════════════ -->
+  <footer class="footer">
 
-        // Dynamically fetch latest release assets from GitHub API to update ALL download buttons
-        async function updateDownloadLinks() {
-            try {
-                const response = await fetch('https://api.github.com/repos/VIKAS-REREAL/REREAL-Spitit/releases/latest');
-                if (!response.ok) throw new Error('Failed to fetch release');
-                
-                const data = await response.json();
-                const assets = data.assets || [];
-                
-                // Filter and sort setup installers by updated_at descending
-                const installers = assets.filter(a => a.name.includes('Setup') && a.name.endsWith('.exe'));
-                installers.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-                
-                const installerAsset = installers[0];
-                const olderInstallers = installers.slice(1);
-                
-                // Filter and sort portable executables by updated_at descending
-                const portables = assets.filter(a => !a.name.includes('Setup') && a.name.endsWith('.exe'));
-                portables.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-                const portableAsset = portables[0];
-                
-                // Update all download buttons with latest links
-                if (installerAsset) {
-                    document.getElementById('hero-installer-btn').href = installerAsset.browser_download_url;
-                    document.getElementById('download-installer-btn').href = installerAsset.browser_download_url;
-                }
-                
-                if (portableAsset) {
-                    document.getElementById('hero-portable-btn').href = portableAsset.browser_download_url;
-                    document.getElementById('download-portable-btn').href = portableAsset.browser_download_url;
-                }
+    <!-- Giant italic watermark -->
+    <div class="footer-wordmark">
+      <span class="footer-wordmark-text">Spitit</span>
+    </div>
 
-                // Populate older versions dropdown
-                dropdownContent.innerHTML = '';
-                
-                if (olderInstallers.length > 0) {
-                    olderInstallers.forEach(asset => {
-                        const match = asset.name.match(/Setup-(\d+\.\d+\.\d+(?:\.\d+)?)/);
-                        const ver = match ? `v${match[1]}` : asset.name;
-                        
-                        const item = document.createElement('a');
-                        item.href = asset.browser_download_url;
-                        item.textContent = `Version ${ver}`;
-                        item.style.display = 'block';
-                        item.style.padding = '10px 16px';
-                        item.style.color = '#FFFFFF';
-                        item.style.textDecoration = 'none';
-                        item.style.fontSize = '14px';
-                        item.style.transition = 'background 0.2s, color 0.2s';
-                        item.style.cursor = 'pointer';
-                        item.style.textAlign = 'left';
-                        
-                        item.onmouseover = () => {
-                            item.style.background = 'rgba(255, 213, 5, 0.15)';
-                            item.style.color = '#FFD505';
-                        };
-                        item.onmouseout = () => {
-                            item.style.background = 'none';
-                            item.style.color = '#FFFFFF';
-                        };
-                        
-                        dropdownContent.appendChild(item);
-                    });
-                } else {
-                    const noVersionsMsg = document.createElement('div');
-                    noVersionsMsg.textContent = 'No older versions found';
-                    noVersionsMsg.style.padding = '10px 16px';
-                    noVersionsMsg.style.color = 'rgba(255,255,255,0.5)';
-                    noVersionsMsg.style.fontSize = '13px';
-                    noVersionsMsg.style.textAlign = 'left';
-                    dropdownContent.appendChild(noVersionsMsg);
-                }
-                
-                console.log('✓ Download links updated with latest release assets (sorted by upload date)');
-            } catch (error) {
-                console.warn('Failed to fetch latest release assets from GitHub API:', error);
-                // Fallback: use direct release links to latest
-                const latestReleaseUrl = 'https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/latest/download';
-                document.getElementById('hero-installer-btn').href = latestReleaseUrl + '/REREAL-Spitit-Setup.exe';
-                document.getElementById('download-installer-btn').href = latestReleaseUrl + '/REREAL-Spitit-Setup.exe';
-                document.getElementById('hero-portable-btn').href = latestReleaseUrl + '/REREAL-Spitit.exe';
-                document.getElementById('download-portable-btn').href = latestReleaseUrl + '/REREAL-Spitit.exe';
-                console.log('✓ Download links set to latest release redirect URLs');
-            }
+    <!-- Main 3-column content -->
+    <div class="footer-inner">
+
+      <!-- Brand column -->
+      <div class="footer-col footer-col-brand">
+        <a href="/" class="footer-logo">
+          <img src="icon.svg" alt="Spitit" width="36" height="36" class="footer-logo-img">
+          <span class="footer-logo-name">Spitit</span>
+        </a>
+        <p class="footer-tagline">The voice-to-text AI that turns speech into clear, polished writing — in every app.</p>
+        <a href="#" id="dl-btn" class="footer-cta">Download for free</a>
+      </div>
+
+      <!-- Product column -->
+      <div class="footer-col">
+        <p class="footer-col-title">Product</p>
+        <a href="guide.html" class="footer-link">Guide</a>
+        <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit/blob/main/CHANGELOG.md" target="_blank" class="footer-link">Changelog</a>
+        <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit/issues" target="_blank" class="footer-link">Report an issue</a>
+      </div>
+
+      <!-- Community column -->
+      <div class="footer-col">
+        <p class="footer-col-title">Community</p>
+        <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit" target="_blank" class="footer-link">GitHub</a>
+        <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit" target="_blank" class="footer-link">Open Source</a>
+        <a href="https://github.com/VIKAS-REREAL/REREAL-Spitit" target="_blank" class="footer-link">MIT License</a>
+      </div>
+
+    </div>
+
+    <!-- Bottom legal bar -->
+    <div class="footer-bottom">
+      <p class="footer-copy">&copy; 2026 Spitit by REREAL. All rights reserved.</p>
+      <p class="footer-version">v2.0.1 &middot; Free &middot; Windows 10 &amp; 11</p>
+    </div>
+
+  </footer>
+
+  <script>
+    // Pill state cycling
+    const pillStates = [
+      { text: 'Recording', color: '#FFD505' },
+      { text: 'Transcribing…', color: '#86EFAC' },
+      { text: '✓ 8 words', color: '#FFD505' }
+    ];
+    let si = 0;
+    const pillTxt = document.getElementById('pill-txt');
+    const pillBars = document.querySelectorAll('.pill-bar');
+    setInterval(() => {
+      si = (si + 1) % pillStates.length;
+      pillTxt.textContent = pillStates[si].text;
+      pillBars.forEach(b => b.style.background = pillStates[si].color);
+    }, 2800);
+
+    // GitHub release links
+    (async () => {
+      try {
+        const d = await (await fetch('https://api.github.com/repos/VIKAS-REREAL/REREAL-Spitit/releases/latest')).json();
+        const asset = (d.assets || []).find(a => a.name.includes('Setup') && a.name.endsWith('.exe'))
+          || (d.assets || []).find(a => a.name.endsWith('.exe'));
+        if (asset) {
+          const url = asset.browser_download_url;
+          ['hero-dl', 'nav-dl', 'dl-btn'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.href = url;
+          });
         }
+      } catch (_) { }
+    })();
+  </script>
 
-        // Call on page load
-        updateDownloadLinks();
-    </script>
 </body>
+
 </html>
