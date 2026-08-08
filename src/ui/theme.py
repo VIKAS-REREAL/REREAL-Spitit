@@ -72,8 +72,9 @@ PILL_ALPHA = 0.94
 PILL_TICK_MS = 52  # animation tick in ms
 
 # Settings window
-SETTINGS_WIDTH = 520
-SETTINGS_HEIGHT = 720
+SETTINGS_WIDTH = 720
+SETTINGS_HEIGHT = 640
+
 
 # Splash
 SPLASH_WIDTH = 460

@@ -46,10 +46,11 @@ def _render_with_pil(svg_path: Path, size: int):
         svg_content = f.read()
 
     # Detect viewBox width/height for scale
-    vb_match = re.search(r'viewBox=["\']\s*\S+\s+\S+\s+(\S+)\s+(\S+)', svg_content)
-    src_w = float(vb_match.group(1)) if vb_match else 600.0
-    src_h = float(vb_match.group(2)) if vb_match else 600.0
+    vb_match = re.search(r'viewBox=["\']\s*([0-9.]+)\s+([0-9.]+)\s+([0-9.]+)\s+([0-9.]+)', svg_content)
+    src_w = float(vb_match.group(3)) if vb_match else 600.0
+    src_h = float(vb_match.group(4)) if vb_match else 600.0
     scale = size / max(src_w, src_h)
+
 
     img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
@@ -86,15 +87,60 @@ def _render_with_pil(svg_path: Path, size: int):
     return img
 
 
-def generate_icon():
-    """Generate the app icon from assets/icon.svg (the authoritative brand icon)."""
+def make_multi_resolution_ico():
+    """
+    Ensure assets/icon.ico contains all 8 standard Windows resolutions
+    (16x16, 24x24, 32x32, 48x48, 64x64, 96x96, 128x128, 256x256)
+    in uncompressed BMP format for 100% Inno Setup & PyInstaller compatibility.
+    """
     root = get_project_root()
-    # SOURCE: assets/icon.svg is the master (richer gradient version)
-    svg_path = root / "assets" / "icon.svg"
+    assets_dir = root / "assets"
+    docs_dir = root / "docs"
+    png_path = assets_dir / "icon.png"
+    ico_path = assets_dir / "icon.ico"
+
+    if not png_path.exists():
+        print(f"[Warning] Cannot build multi-res ICO: {png_path} missing")
+        return
+
+    try:
+        from PIL import Image
+        img = Image.open(png_path).convert("RGBA")
+        ico_sizes = [(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (96, 96), (128, 128), (256, 256)]
+        img.save(str(ico_path), format="ICO", sizes=ico_sizes, bitmap_format="bmp")
+        print(f"[OK] Generated uncompressed multi-res ICO for Inno Setup: {ico_path}")
+
+        # Mirror to docs/
+        if docs_dir.exists():
+            img.save(str(docs_dir / "icon.ico"), format="ICO", sizes=ico_sizes, bitmap_format="bmp")
+    except Exception as e:
+        print(f"[Warning] Failed building multi-res ICO: {e}")
+
+
+
+def generate_icon(force: bool = False):
+    """Generate the app icon from assets/icon.svg if missing or forced. Preserves custom icons."""
+    root = get_project_root()
+    assets_dir = root / "assets"
+    png_path = assets_dir / "icon.png"
+    ico_path = assets_dir / "icon.ico"
+    svg_path = assets_dir / "icon.svg"
+
+    if "--force" in sys.argv:
+        force = True
+
+    # If custom PNG exists, generate 8-frame multi-res ICO from it
+    if png_path.exists():
+        make_multi_resolution_ico()
+        return
+
+    if not force and png_path.exists() and ico_path.exists():
+        print(f"[OK] Preserving custom icons: {png_path} and {ico_path}")
+        return
 
     if not svg_path.exists():
-        print(f"[Error] Source icon not found: {svg_path}")
-        sys.exit(1)
+        print(f"[Warning] Source icon not found: {svg_path}")
+        return
 
     print(f"[*] Rendering from {svg_path}")
     size = 512
@@ -104,30 +150,28 @@ def generate_icon():
         print("[*] cairosvg not available, using PIL rect fallback")
         img = _render_with_pil(svg_path, size)
 
-    assets_dir = root / "assets"
     assets_dir.mkdir(parents=True, exist_ok=True)
     docs_dir = root / "docs"
 
-    ico_sizes = [16, 32, 48, 64, 128, 256]
+    ico_sizes = [(16, 16), (24, 24), (32, 32), (48, 48), (64, 64), (96, 96), (128, 128), (256, 256)]
 
     # Save assets/icon.png and assets/icon.ico
-    png_path = assets_dir / "icon.png"
     img.save(str(png_path), "PNG")
     print(f"[OK] Saved: {png_path}")
 
-    ico_path = assets_dir / "icon.ico"
-    img.save(str(ico_path), format="ICO", sizes=[(s, s) for s in ico_sizes])
+    img.save(str(ico_path), format="ICO", sizes=ico_sizes)
     print(f"[OK] Saved: {ico_path}")
 
-    # Mirror to docs/ for the web page
-    img.save(str(docs_dir / "icon.png"), "PNG")
-    img.save(str(docs_dir / "icon.ico"), format="ICO", sizes=[(s, s) for s in ico_sizes])
-    print(f"[OK] Saved copies to docs/")
+    if docs_dir.exists():
+        img.save(str(docs_dir / "icon.png"), "PNG")
+        img.save(str(docs_dir / "icon.ico"), format="ICO", sizes=ico_sizes)
+        print(f"[OK] Saved copies to docs/")
+
 
     # docs/icon.svg — copy the same SVG so the web page nav shows the richer icon
     import shutil
     shutil.copy(str(svg_path), str(docs_dir / "icon.svg"))
-    print(f"[OK] Copied assets/icon.svg → docs/icon.svg")
+    print("[OK] Copied assets/icon.svg -> docs/icon.svg")
 
 
 if __name__ == "__main__":

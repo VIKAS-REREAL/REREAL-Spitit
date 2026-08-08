@@ -22,7 +22,7 @@ if _base not in sys.path:
 
 import customtkinter as ctk
 
-from src.config import load_config, save_config, add_history_entry, VERSION
+from src.config import load_config, save_config, add_history_entry, VERSION, setup_app_user_model_id, set_window_icon
 from src.ui.theme import BG_DEEP, get_fonts
 
 
@@ -48,6 +48,9 @@ class VoiceFlowApp:
 
     def run(self):
         """Start the application."""
+        # Set AppUserModelID so Windows Taskbar/Task Manager group the app under custom icon
+        setup_app_user_model_id()
+
         # Set up CTk
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("dark-blue")
@@ -57,16 +60,9 @@ class VoiceFlowApp:
         self._root.withdraw()  # Hide main window
         self._root.title("REREAL - Spitit")
 
-        # Try to set icon on root
-        try:
-            import tkinter as tk
-            from src.config import get_asset_path
-            png_path = get_asset_path("icon.png")
-            if png_path.exists():
-                icon_img = tk.PhotoImage(file=str(png_path))
-                self._root.iconphoto(False, icon_img)
-        except Exception:
-            pass
+        # Set app icon on root window
+        set_window_icon(self._root)
+
 
         # Initialize fonts (must be after root exists)
         self._fonts = get_fonts()
@@ -133,19 +129,25 @@ class VoiceFlowApp:
     def _open_settings(self, highlight_api_key: bool = False):
         """Open the settings window."""
         from src.ui.settings import SettingsWindow
-        if self._settings_win is None:
+        if self._settings_win is None or not hasattr(self._settings_win, "_win") or self._settings_win._win is None:
             self._settings_win = SettingsWindow(
                 self._root,
                 self._config,
                 self._fonts,
                 on_save=self._on_settings_saved,
+                on_close=self._on_settings_closed,
             )
         self._settings_win.show(highlight_api_key=highlight_api_key)
+
+    def _on_settings_closed(self):
+        """Called when settings window is closed."""
+        self._settings_win = None
 
     def _on_settings_saved(self, config: dict):
         """Called when settings are saved."""
         self._config = config
         self._settings_win = None
+
 
         # Update hotkey controller
         if self._hotkey_ctrl:

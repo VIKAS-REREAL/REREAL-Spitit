@@ -291,3 +291,75 @@ class StatusBadge(ctk.CTkLabel):
         g = int(bg + (g - bg) * factor)
         b = int(bg + (b - bg) * factor)
         return f"#{r:02x}{g:02x}{b:02x}"
+
+
+class SidebarNavButton(ctk.CTkFrame):
+    """
+    Sidebar navigation button with icon, label, and ACCENT left-border indicator when active.
+    """
+
+    def __init__(self, master, title: str, icon: str = "", fonts=None, command=None, **kwargs):
+        super().__init__(
+            master,
+            fg_color="transparent",
+            border_width=0,
+            corner_radius=CORNER_RADIUS_SM,
+            height=42,
+            **kwargs,
+        )
+        self.pack_propagate(False)
+        self._command = command
+        self._active = False
+
+        # Left accent indicator bar
+        self._indicator = ctk.CTkFrame(self, width=4, fg_color="transparent", corner_radius=2)
+        self._indicator.pack(side="left", fill="y", padx=(4, 8), pady=6)
+
+        # Label with icon + text
+        display_text = f"{icon}  {title}" if icon else title
+        self._label = ctk.CTkLabel(
+            self,
+            text=display_text,
+            text_color=TEXT_SECONDARY,
+            font=fonts["md_b"] if fonts else None,
+            anchor="w",
+        )
+        self._label.pack(side="left", fill="x", expand=True, pady=8)
+
+        # Bind click events
+        self.bind("<Button-1>", lambda e: self._on_click())
+        self._label.bind("<Button-1>", lambda e: self._on_click())
+        self._indicator.bind("<Button-1>", lambda e: self._on_click())
+
+        # Hover effects
+        self.bind("<Enter>", lambda e: self._on_enter())
+        self.bind("<Leave>", lambda e: self._on_leave())
+        self._label.bind("<Enter>", lambda e: self._on_enter())
+        self._label.bind("<Leave>", lambda e: self._on_leave())
+
+    def set_active(self, active: bool):
+        self._active = active
+        if active:
+            self.configure(fg_color="#282619", border_color=ACCENT, border_width=1)
+            self._indicator.configure(fg_color=ACCENT)
+            self._label.configure(text_color=ACCENT)
+        else:
+            self.configure(fg_color="transparent", border_width=0)
+            self._indicator.configure(fg_color="transparent")
+            self._label.configure(text_color=TEXT_SECONDARY)
+
+
+    def _on_click(self):
+        if self._command:
+            self._command()
+
+    def _on_enter(self):
+        if not self._active:
+            self.configure(fg_color=BG_SURFACE)
+            self._label.configure(text_color=TEXT_PRIMARY)
+
+    def _on_leave(self):
+        if not self._active:
+            self.configure(fg_color="transparent")
+            self._label.configure(text_color=TEXT_SECONDARY)
+

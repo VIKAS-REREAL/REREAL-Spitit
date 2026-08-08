@@ -107,19 +107,22 @@ class TrayManager:
 
     def _load_icon(self):
         """Load the tray icon image."""
-        from PIL import Image, ImageDraw
+        from PIL import Image
 
         # Try to load from assets
         try:
             from src.config import get_asset_path
             icon_path = get_asset_path("icon.png")
             if icon_path.exists():
-                return Image.open(icon_path).resize((64, 64))
-        except Exception:
-            pass
+                img = Image.open(icon_path).convert("RGBA")
+                resample = getattr(Image, "Resampling", Image).LANCZOS
+                return img.resize((64, 64), resample)
+        except Exception as e:
+            print(f"[Tray] Failed loading asset icon: {e}")
 
         # Fallback: generate programmatically
         return self._generate_icon()
+
 
     def _generate_icon(self):
         """Generate a simple tray icon programmatically."""

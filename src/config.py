@@ -160,3 +160,111 @@ def set_launch_on_startup(enabled: bool) -> None:
         winreg.CloseKey(key)
     except Exception as e:
         print(f"[Config] Failed to set startup: {e}")
+
+
+def setup_app_user_model_id(app_id: str = "REREAL.Spitit.VoiceFlow.2.0") -> None:
+    """
+    Set Windows Application User Model ID (AppUserModelID).
+    Ensures Windows Taskbar and Task Manager group the process under
+    its custom icon instead of generic Python / executable icon.
+    """
+    import sys
+    if sys.platform == "win32":
+        try:
+            import ctypes
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(app_id)
+        except Exception as e:
+            print(f"[Config] Failed to set AppUserModelID: {e}")
+
+
+def apply_win32_icon(window, ico_path_str: str) -> None:
+    """Force Win32 WM_SETICON message directly to the window HWND for titlebar and taskbar."""
+    try:
+        import ctypes
+
+        user32 = ctypes.windll.user32
+        WM_SETICON = 0x0080
+        ICON_SMALL = 0
+        ICON_BIG = 1
+        IMAGE_ICON = 1
+        LR_LOADFROMFILE = 0x0010
+
+        window.update_idletasks()
+        raw_hwnd = window.winfo_id()
+        hwnd = user32.GetParent(raw_hwnd) or raw_hwnd
+
+        # Load 16x16 icon for titlebar
+        hicon_small = user32.LoadImageW(
+            0, ico_path_str, IMAGE_ICON, 16, 16, LR_LOADFROMFILE
+        )
+        # Load 48x48 icon for taskbar / Alt-Tab
+        hicon_big = user32.LoadImageW(
+            0, ico_path_str, IMAGE_ICON, 48, 48, LR_LOADFROMFILE
+        )
+
+        if hicon_small:
+            user32.SendMessageW(hwnd, WM_SETICON, ICON_SMALL, hicon_small)
+        if hicon_big:
+            user32.SendMessageW(hwnd, WM_SETICON, ICON_BIG, hicon_big)
+    except Exception:
+        pass
+
+
+def set_window_icon(window) -> None:
+    """
+    Apply the app icon to a Tkinter / CustomTkinter window.
+    Overrides CustomTkinter's default blue icon by marking _iconbitmap_method_called
+    and applying iconbitmap + Win32 WM_SETICON immediately and after CTk's timer.
+    """
+    try:
+        import sys
+        import tkinter as tk
+
+        ico_path = get_asset_path("icon.ico")
+        png_path = get_asset_path("icon.png")
+
+        # Mark CTk flag so CTk doesn't overwrite with CustomTkinter_icon_Windows.ico
+        setattr(window, "_iconbitmap_method_called", True)
+
+        # 1. Tkinter iconphoto (global default for all windows)
+        if png_path.exists():
+            try:
+                icon_img = tk.PhotoImage(file=str(png_path))
+                window.iconphoto(True, icon_img)
+                window._icon_photo_ref = icon_img
+            except Exception:
+                pass
+
+        # 2. Tkinter iconbitmap + Win32 WM_SETICON
+        if sys.platform == "win32" and ico_path.exists():
+            ico_str = str(ico_path)
+            try:
+                window.iconbitmap(ico_str)
+            except Exception:
+                try:
+                    window.wm_iconbitmap(ico_str)
+                except Exception:
+                    pass
+
+            # Inject Win32 WM_SETICON immediately and at 100ms, 250ms, 400ms
+            apply_win32_icon(window, ico_str)
+
+            def _apply_override(p=ico_str):
+                try:
+                    setattr(window, "_iconbitmap_method_called", True)
+                    window.iconbitmap(p)
+                    apply_win32_icon(window, p)
+                except Exception:
+                    pass
+
+            for delay in (100, 250, 400):
+                try:
+                    window.after(delay, _apply_override)
+                except Exception:
+                    pass
+    except Exception as e:
+        print(f"[Config] Failed to set window icon: {e}")
+
+
+
+

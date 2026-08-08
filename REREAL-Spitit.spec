@@ -16,8 +16,10 @@ for pkg in ("customtkinter", "pystray", "plyer"):
 datas += [
     ("assets/icon.png", "assets"),
     ("assets/icon.ico", "assets"),
+    ("assets/icon.svg", "assets"),
     ("assets/sound/done.wav", "assets/sound"),
 ]
+
 
 hiddenimports += [
     "PIL._tkinter_finder",

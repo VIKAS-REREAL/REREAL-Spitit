@@ -22,6 +22,13 @@ LicenseFile=license.rtf
 DefaultDirName={autopf}\REREAL Spitit
 DefaultGroupName=REREAL Spitit
 AllowNoIcons=no
+UsePreviousAppDir=yes
+DirExistsWarning=yes
+AppendDefaultDirName=yes
+CloseApplications=force
+CloseApplicationsFilter=*.exe
+Uninstallable=yes
+CreateUninstallRegKey=yes
 OutputDir=..\dist_installer
 OutputBaseFilename=REREAL-Spitit-Setup-{#MyAppVersion}
 SetupIconFile=..\assets\icon.ico
@@ -32,6 +39,7 @@ UninstallDisplayIcon={app}\{#MyAppExeName}
 VersionInfoVersion={#MyAppVersion}.0
 VersionInfoCompany={#MyAppPublisher}
 VersionInfoProductName={#MyAppName}
+
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -45,9 +53,10 @@ Name: "startup"; Description: "Launch &automatically on Windows startup"; GroupD
 Source: "..\dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-Name: "{group}\Uninstall {#MyAppName}"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppExeName}"; IconIndex: 0
+Name: "{group}\Uninstall {#MyAppName}"; Filename: "{uninstallexe}"; IconFilename: "{app}\{#MyAppExeName}"; IconIndex: 0
+Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon; IconFilename: "{app}\{#MyAppExeName}"; IconIndex: 0
+
 
 [Registry]
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; \

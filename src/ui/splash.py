@@ -4,6 +4,8 @@ Shown on first run or when launch_on_startup is true.
 """
 
 import customtkinter as ctk
+from PIL import Image
+from src.config import get_asset_path, set_window_icon
 from src.ui.theme import (
     BG_BASE, ACCENT, ACCENT_DIM, TEXT_PRIMARY, TEXT_SECONDARY,
     TEXT_MUTED, SPLASH_WIDTH, SPLASH_HEIGHT, CORNER_RADIUS_SM,
@@ -41,28 +43,33 @@ class SplashScreen:
         self._win.configure(fg_color=BG_BASE)
         self._win.resizable(False, False)
 
-        # Try to set icon
-        try:
-            import tkinter as tk
-            from src.config import get_asset_path
-            png_path = get_asset_path("icon.png")
-            if png_path.exists():
-                icon_img = tk.PhotoImage(file=str(png_path))
-                self._win.iconphoto(False, icon_img)
-        except Exception:
-            pass
+        # Set window icon
+        set_window_icon(self._win)
 
         # Content
         content = ctk.CTkFrame(self._win, fg_color="transparent")
         content.pack(fill="both", expand=True, padx=32, pady=24)
 
-        # Logo placeholder (yellow circle with bars)
+        # Logo Frame with branding image
         logo_frame = ctk.CTkFrame(content, fg_color="transparent")
         logo_frame.pack(pady=(16, 8))
 
-        logo_canvas = ctk.CTkCanvas(logo_frame, width=64, height=64, bg=BG_BASE, highlightthickness=0)
-        logo_canvas.pack()
-        self._draw_logo(logo_canvas)
+        try:
+            png_path = get_asset_path("icon.png")
+            if png_path.exists():
+                pil_img = Image.open(png_path).convert("RGBA")
+                ctk_img = ctk.CTkImage(light_image=pil_img, dark_image=pil_img, size=(64, 64))
+                logo_lbl = ctk.CTkLabel(logo_frame, image=ctk_img, text="")
+                logo_lbl.pack()
+            else:
+                logo_canvas = ctk.CTkCanvas(logo_frame, width=64, height=64, bg=BG_BASE, highlightthickness=0)
+                logo_canvas.pack()
+                self._draw_logo(logo_canvas)
+        except Exception:
+            logo_canvas = ctk.CTkCanvas(logo_frame, width=64, height=64, bg=BG_BASE, highlightthickness=0)
+            logo_canvas.pack()
+            self._draw_logo(logo_canvas)
+
 
         # Title
         title = ctk.CTkLabel(
