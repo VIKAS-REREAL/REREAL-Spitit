@@ -1,3 +1,38 @@
+# REREAL - Spitit v2.0.2 — Launch Stability & Microsoft Store MSIX Packaging
+
+🚀 **REREAL - Spitit v2.0.2** brings full Microsoft Store MSIX packaging support, crash-proof launch initialization under Windows 11 containers, modern borderless unplated taskbar/start menu icons, and unified release automation.
+
+---
+
+## 🌟 What's New in v2.0.2
+
+### 🛡️ Crash-Proof Launch Under Windows 11 / MSIX Container
+- **Resolved Policy 10.1.2.10 Launch Crash**: PyInstaller windowless builds (`console=False`) set `sys.stdout` and `sys.stderr` to `None`. Any unhandled stream access or print call in low-level hooks previously crashed the process silently inside MSIX containerized environments.
+- **Log Stream Redirection**: Automatically redirects all output streams to `%LOCALAPPDATA%\REREAL_Spitit\spitit.log` with automatic 1 MB log rotation before any GUI code initializes.
+- **Defensive Startup Safeguards**: System tray, global hotkeys, and floating status pill are wrapped in fault-tolerant handlers with full logging diagnostics.
+
+### 🎨 Modern Borderless & Unplated Visual Assets
+- **Square Backplate Elimination**: Windows 10/11 defaults to adding a solid colored square plate behind icons if unplated target assets are missing.
+- **87 High-DPI Visual Assets**: Generated full target sizes (16px to 256px) of `_altform-unplated` and `_altform-lightunplated` PNGs, along with full DPI scale sets (`scale-100` through `scale-400`).
+- **Clean System Integration**: Seamless transparent icon rendering across Windows Taskbar, Start Menu, Alt+Tab switcher, and Windows App Installer.
+
+### 📦 Microsoft Store MSIX Packaging Pipeline
+- **Automated Windows SDK Integration**: `build-msix.ps1` automatically searches for `MakePri.exe` to index visual assets into `resources.pri` and uses `MakeAppx.exe` to compile the official `.msix` package.
+- **Unified Release Command**: Run `.\build-release.ps1 -Installer -MSIX` to build the Portable EXE, Inno Setup Installer, and MSIX package in one command.
+- **Comprehensive Guide**: Added `docs/MSIX_PACKAGING.md` with step-by-step instructions for sideloading, local developer certificate signing, and Partner Center submission.
+
+---
+
+## 📥 Downloads & Assets (v2.0.2)
+
+| File Name | Description | Size | Status |
+|-----------|-------------|------|--------|
+| `REREAL-Spitit-Setup-2.0.2.exe` | **Windows Installer** (Recommended) — Setup wizard with desktop & start shortcuts | ~70 MB | Verified |
+| `REREAL-Spitit.exe` | **Portable Executable** — Single `.exe`, no installation required | ~69 MB | Verified |
+| `REREAL-Spitit-2.0.2.msix` | **MSIX Package** — Microsoft Store & modern Windows 10/11 sideload package | ~79 MB | Verified |
+
+---
+
 # REREAL - Spitit v2.0.1 — Settings Redesign & High-DPI Windows Branding
 
 🚀 **REREAL - Spitit v2.0.1** introduces a major UI/UX redesign of the Settings window, full multi-resolution high-DPI Windows icon branding, live microphone level metering, and enhanced Windows installer upgrade rules.

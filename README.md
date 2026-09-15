@@ -40,8 +40,9 @@
 
 | Type | Description | Link |
 |------|-------------|------|
-| **Installer** (recommended) | Full setup wizard with shortcuts | [Download v2.0.1](https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/download/latest/REREAL-Spitit-Setup-2.0.1.exe) |
-| **Portable** | Single .exe, no install needed | [Download v2.0.1 (Portable)](https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/download/latest/REREAL-Spitit.exe) |
+| **Installer** (recommended) | Full setup wizard with shortcuts | [Download v2.0.2](https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/download/latest/REREAL-Spitit-Setup-2.0.2.exe) |
+| **Portable** | Single .exe, no install needed | [Download v2.0.2 (Portable)](https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/download/latest/REREAL-Spitit.exe) |
+| **MSIX Package** | Microsoft Store & Windows 10/11 sideload | [Download v2.0.2 (MSIX)](https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/download/latest/REREAL-Spitit-2.0.2.msix) |
 
 **System Requirements:** Windows 10/11 (64-bit), ~50MB disk, internet for transcription, a microphone.
 
@@ -73,27 +74,32 @@ cd REREAL-Spitit
 
 # Install dependencies
 pip install -r requirements.txt
+pip install pyinstaller Pillow
 
 # Run in development
 python src/main.py
 
 # Build portable .exe
-pip install pyinstaller
 python scripts/build_icon.py
 python scripts/generate_sound.py
 python -m PyInstaller --noconfirm REREAL-Spitit.spec
 
-# Build everything (portable + installer)
-.\build-release.ps1 -Installer
+# Build MSIX package (requires Windows SDK)
+.\build-msix.ps1
+
+# Build everything (portable .exe + Inno Setup installer + MSIX package)
+.\build-release.ps1 -Installer -MSIX
 ```
+
+See [docs/MSIX_PACKAGING.md](docs/MSIX_PACKAGING.md) for full Microsoft Store packaging details.
 
 ## 📁 Project Structure
 
 ```
 REREAL-Spitit/
 ├── src/
-│   ├── main.py          # App entry point & orchestrator
-│   ├── config.py        # Config management
+│   ├── main.py          # App entry point, orchestrator & crash safeguards
+│   ├── config.py        # Config management & stream logging
 │   ├── recorder.py      # Mic capture
 │   ├── transcriber.py   # Groq Whisper client
 │   ├── paster.py        # Output handling
@@ -106,11 +112,17 @@ REREAL-Spitit/
 │       ├── settings.py  # Settings window
 │       ├── splash.py    # Splash screen
 │       └── components.py # Reusable widgets
+├── msix/                # MSIX packaging manifest & visual assets
+│   ├── AppxManifest.xml # Windows Package Manifest
+│   └── Assets/          # 80+ unplated high-DPI icons
 ├── scripts/
-│   ├── build_icon.py    # Icon generator
-│   └── generate_sound.py # Done sound generator
+│   ├── build_icon.py    # Multi-resolution ICO builder
+│   ├── generate_msix_assets.py # MSIX visual asset generator
+│   └── generate_sound.py # Audio feedback generator
 ├── installer/           # Inno Setup files
-├── docs/                # GitHub Pages website
+├── docs/                # GitHub Pages website & packaging docs
+├── build-release.ps1    # Unified release build script
+├── build-msix.ps1       # MSIX package build & signing script
 └── ...
 ```
 

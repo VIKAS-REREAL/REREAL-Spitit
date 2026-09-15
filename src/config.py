@@ -6,13 +6,15 @@ stored in %LOCALAPPDATA%\\REREAL_Spitit\\.
 
 import json
 import os
+import sys
 import copy
+import logging
 from pathlib import Path
 from datetime import datetime
 
 APP_NAME = "REREAL_Spitit"
 CONFIG_FILENAME = "config.json"
-VERSION = "2.0.1"
+VERSION = "2.0.2"
 MAX_HISTORY = 50
 
 DEFAULTS = {
@@ -45,6 +47,63 @@ def get_config_dir() -> Path:
     config_dir = Path(local_app_data) / APP_NAME
     config_dir.mkdir(parents=True, exist_ok=True)
     return config_dir
+
+
+def setup_logging() -> None:
+    """
+    Redirect stdout/stderr to a log file when running as a frozen PyInstaller exe.
+    Must be called at the very start of main() before ANY other initialization.
+
+    When PyInstaller builds with console=False (windowed mode), sys.stdout and
+    sys.stderr are None. Every print() call then raises:
+        AttributeError: 'NoneType' object has no attribute 'write'
+    This silently kills the process — no error dialog, no Event Log entry.
+
+    Inside MSIX, this is fatal because there is no console window at all.
+    """
+    try:
+        config_dir = get_config_dir()
+        log_path = config_dir / "spitit.log"
+
+        # Rotate: keep last log as .log.old, cap at 1 MB
+        try:
+            if log_path.exists() and log_path.stat().st_size > 1_000_000:
+                old_path = config_dir / "spitit.log.old"
+                if old_path.exists():
+                    old_path.unlink()
+                log_path.rename(old_path)
+        except OSError:
+            pass
+
+        log_file = open(log_path, "a", encoding="utf-8", buffering=1)  # line-buffered
+
+        # Replace None or broken streams
+        if sys.stdout is None or not hasattr(sys.stdout, "write"):
+            sys.stdout = log_file
+        if sys.stderr is None or not hasattr(sys.stderr, "write"):
+            sys.stderr = log_file
+
+        # Also configure Python logging to the same file
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(asctime)s [%(levelname)s] %(message)s",
+            handlers=[logging.FileHandler(log_path, encoding="utf-8")],
+        )
+        logging.info("=== REREAL - Spitit v%s starting ===", VERSION)
+        logging.info("Frozen: %s, MSIX: %s, CWD: %s",
+                      getattr(sys, "frozen", False),
+                      bool(os.environ.get("MSIX_PACKAGE_NAME")),
+                      os.getcwd())
+        if getattr(sys, "frozen", False):
+            logging.info("Executable: %s", sys.executable)
+            logging.info("_MEIPASS: %s", getattr(sys, "_MEIPASS", "N/A"))
+    except Exception:
+        # Absolute last resort — if we can't even set up logging, don't crash
+        # Ensure stdout/stderr are at least writable
+        if sys.stdout is None:
+            sys.stdout = open(os.devnull, "w")
+        if sys.stderr is None:
+            sys.stderr = open(os.devnull, "w")
 
 
 def get_config_path() -> Path:

@@ -2,7 +2,7 @@
 ; Builds a Windows installer with modern wizard UI.
 
 #define MyAppName "REREAL - Spitit"
-#define MyAppVersion "2.0.1"
+#define MyAppVersion "2.0.2"
 #define MyAppPublisher "REREAL"
 #define MyAppURL "https://vikas-rereal.github.io/REREAL-Spitit/"
 #define MyAppExeName "REREAL-Spitit.exe"

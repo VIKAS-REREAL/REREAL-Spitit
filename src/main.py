@@ -8,6 +8,7 @@ import sys
 import os
 import threading
 import time
+import logging
 
 # Ensure src is importable when running directly
 if getattr(sys, "frozen", False):
@@ -19,6 +20,9 @@ else:
 if _base not in sys.path:
     sys.path.insert(0, _base)
 
+# Initialize logging and redirect stdout/stderr immediately to protect all imports
+from src.config import setup_logging
+setup_logging()
 
 import customtkinter as ctk
 
@@ -83,36 +87,45 @@ class VoiceFlowApp:
 
     def _init_pill(self):
         """Initialize the floating status pill."""
-        from src.ui.pill import StatusPill
-        self._pill = StatusPill(self._root, self._config)
+        try:
+            from src.ui.pill import StatusPill
+            self._pill = StatusPill(self._root, self._config)
+        except Exception as e:
+            logging.error("Pill init failed (non-fatal): %s", e, exc_info=True)
+            self._pill = None
 
     def _init_tray(self):
         """Initialize the system tray icon."""
-        from src.tray import TrayManager
-        self._tray = TrayManager(
-            on_open_settings=lambda: self._root.after(0, self._open_settings),
-            on_toggle_mode=lambda: self._root.after(0, self._toggle_mode),
-            on_check_updates=lambda: self._root.after(0, self._check_updates_from_tray),
-            on_copy_last=lambda: self._root.after(0, self._copy_last),
-            on_quit=lambda: self._root.after(0, self._quit),
-            config=self._config,
-        )
-        self._tray.start()
+        try:
+            from src.tray import TrayManager
+            self._tray = TrayManager(
+                on_open_settings=lambda: self._root.after(0, self._open_settings),
+                on_toggle_mode=lambda: self._root.after(0, self._toggle_mode),
+                on_check_updates=lambda: self._root.after(0, self._check_updates_from_tray),
+                on_copy_last=lambda: self._root.after(0, self._copy_last),
+                on_quit=lambda: self._root.after(0, self._quit),
+                config=self._config,
+            )
+            self._tray.start()
+        except Exception as e:
+            logging.error("Tray init failed (non-fatal): %s", e, exc_info=True)
+            self._tray = None
 
     def _init_hotkey(self):
         """Initialize the global hotkey controller."""
-        from src.hotkey import HotkeyController
-        self._hotkey_ctrl = HotkeyController(
-            hold_combo=self._config.get("hold_hotkey", "alt+left shift"),
-            toggle_combo=self._config.get("toggle_hotkey", "alt+left shift+space"),
-            mode=self._config.get("mode", "hold"),
-            on_start=lambda: self._root.after(0, self._start_recording),
-            on_stop=lambda: self._root.after(0, self._stop_recording),
-        )
         try:
+            from src.hotkey import HotkeyController
+            self._hotkey_ctrl = HotkeyController(
+                hold_combo=self._config.get("hold_hotkey", "alt+left shift"),
+                toggle_combo=self._config.get("toggle_hotkey", "alt+left shift+space"),
+                mode=self._config.get("mode", "hold"),
+                on_start=lambda: self._root.after(0, self._start_recording),
+                on_stop=lambda: self._root.after(0, self._stop_recording),
+            )
             self._hotkey_ctrl.start()
         except Exception as e:
-            print(f"[Main] Hotkey init failed: {e}")
+            logging.error("Hotkey init failed (non-fatal): %s", e, exc_info=True)
+            self._hotkey_ctrl = None
 
     def _show_splash(self, highlight_api_key: bool = False):
         """Show the splash screen."""
@@ -195,7 +208,8 @@ class VoiceFlowApp:
 
         # Check API key
         if not self._config.get("api_key"):
-            self._pill.set_state("error")
+            if self._pill:
+                self._pill.set_state("error")
             self._root.after(500, lambda: self._open_settings(highlight_api_key=True))
             return
 
@@ -207,11 +221,13 @@ class VoiceFlowApp:
             self._recorder.start(on_auto_stop=lambda: self._root.after(0, self._stop_recording))
             self._recording = True
             self._record_start_time = time.time()
-            self._pill.set_state("recording")
+            if self._pill:
+                self._pill.set_state("recording")
             self._start_duration_timer()
         except Exception as e:
             print(f"[Main] Recording failed: {e}")
-            self._pill.set_state("error")
+            if self._pill:
+                self._pill.set_state("error")
             self._recording = False
 
     def _stop_recording(self):
@@ -226,22 +242,26 @@ class VoiceFlowApp:
             wav_bytes = self._recorder.stop()
         except Exception as e:
             print(f"[Main] Stop recording failed: {e}")
-            self._pill.set_state("error")
+            if self._pill:
+                self._pill.set_state("error")
             return
 
         if wav_bytes is None:
             # Too short
-            self._pill.set_state("hidden")
+            if self._pill:
+                self._pill.set_state("hidden")
             return
 
         # Check silence
         threshold = self._config.get("silence_threshold", 0.01)
         if self._recorder.check_silence(wav_bytes, threshold):
-            self._pill.set_state("error")
+            if self._pill:
+                self._pill.set_state("error")
             return
 
         # Transcribe in background
-        self._pill.set_state("transcribing")
+        if self._pill:
+            self._pill.set_state("transcribing")
         threading.Thread(
             target=self._transcribe_thread,
             args=(wav_bytes,),
@@ -254,14 +274,16 @@ class VoiceFlowApp:
             self._recorder.cancel()
         self._recording = False
         self._stop_duration_timer()
-        self._pill.set_state("hidden")
+        if self._pill:
+            self._pill.set_state("hidden")
 
     def _start_duration_timer(self):
         """Start updating the pill with recording duration."""
         def tick():
             if self._recording:
                 duration = time.time() - self._record_start_time
-                self._pill.update_duration(duration)
+                if self._pill:
+                    self._pill.update_duration(duration)
                 self._duration_timer_id = self._root.after(200, tick)
         tick()
 
@@ -285,7 +307,7 @@ class VoiceFlowApp:
 
         except Exception as e:
             print(f"[Main] Transcription failed: {e}")
-            self._root.after(0, lambda: self._pill.set_state("error"))
+            self._root.after(0, lambda: self._pill.set_state("error") if self._pill else None)
 
     def _on_transcription_done(self, text: str):
         """Handle successful transcription (on main thread)."""
@@ -304,7 +326,8 @@ class VoiceFlowApp:
         )
 
         # Show done state with word count
-        self._pill.set_state("done", word_count=word_count)
+        if self._pill:
+            self._pill.set_state("done", word_count=word_count)
 
         # Paste/clipboard/notification/sound
         from src.paster import paste_text
@@ -336,8 +359,29 @@ class VoiceFlowApp:
 
 def main():
     """Application entry point."""
-    app = VoiceFlowApp()
-    app.run()
+    # CRITICAL: Set up logging FIRST — before any other code runs.
+    # Without this, frozen PyInstaller EXE with console=False has
+    # sys.stdout = None, and any print() or unhandled exception
+    # causes a silent instant crash (no error dialog, no Event Log).
+    setup_logging()
+
+    try:
+        app = VoiceFlowApp()
+        app.run()
+    except Exception as e:
+        # Last-resort crash handler — log and show error dialog
+        logging.critical("FATAL: Unhandled exception in main: %s", e, exc_info=True)
+        try:
+            import ctypes
+            ctypes.windll.user32.MessageBoxW(
+                0,
+                f"REREAL - Spitit encountered a fatal error:\n\n{e}\n\nPlease check the log file in:\n%LOCALAPPDATA%\\REREAL_Spitit\\spitit.log",
+                "REREAL - Spitit — Error",
+                0x10,  # MB_ICONERROR
+            )
+        except Exception:
+            pass
+        sys.exit(1)
 
 
 if __name__ == "__main__":

@@ -26,10 +26,19 @@ env/
 # Build outputs
 dist/
 dist_installer/
+dist_msix/
 build/
+*.pri
+*.cer
+*.pfx
 
 # Config (user-specific, never commit)
 config.json
+
+# Logs & temp files
+*.log
+*.log.*
+*.tmp
 
 # OS
 Thumbs.db

@@ -1,4 +1,7 @@
-param([switch]$Installer)
+param(
+    [switch]$Installer,
+    [switch]$MSIX
+)
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 
@@ -28,7 +31,7 @@ if (-not (Test-Path $exe)) {
 Write-Host "  Portable: $exe" -ForegroundColor Green
 
 if ($Installer) {
-    Write-Host "[5/5] Building installer..." -ForegroundColor Cyan
+    Write-Host "[5/5] Building Inno Setup installer..." -ForegroundColor Cyan
 
     $iscc = $null
     foreach ($c in @(
@@ -52,6 +55,14 @@ if ($Installer) {
     }
 } else {
     Write-Host "[5/5] Skipping installer (use -Installer flag to build)" -ForegroundColor DarkGray
+}
+
+if ($MSIX) {
+    Write-Host ""
+    Write-Host "[+] Building MSIX package..." -ForegroundColor Cyan
+    .\build-msix.ps1 -SkipPyInstaller
+} else {
+    Write-Host "Skipping MSIX package (use -MSIX flag to build)" -ForegroundColor DarkGray
 }
 
 Write-Host ""

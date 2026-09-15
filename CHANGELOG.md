@@ -5,6 +5,20 @@ All notable changes to REREAL - Spitit will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.2] - 2026-09-16
+
+### Fixed
+- **MSIX / Windows 11 Launch Crash Fix (Policy 10.1.2.10)**: Fixed silent crash at launch caused by PyInstaller windowless mode (`console=False`) having `sys.stdout = None` and `sys.stderr = None`, where standard print/stream calls raised unhandled `AttributeError` inside MSIX container environments.
+- **Log Stream Redirection & Rotation**: Added `setup_logging()` to redirect stdout, stderr, and Python `logging` to `%LOCALAPPDATA%\REREAL_Spitit\spitit.log` with automatic 1 MB log rotation.
+- **Defensive Startup Safeguards**: Added fault-tolerant exception handling around system tray (`_init_tray`), global hotkeys (`_init_hotkey`), and UI pill components to gracefully recover without crashing the process.
+- **Target OS MaxVersionTested**: Updated MSIX manifest `MaxVersionTested` to `10.0.26100.0` for full Windows 11 24H2 compatibility.
+
+### Added
+- **Modern Borderless & Unplated MSIX Assets**: Generated full set of transparent, unplated target-size assets (`_altform-unplated` and `_altform-lightunplated` from 16px to 256px) and high-DPI scale variants (100% to 400%), removing unwanted colored square backgrounds from the Windows Taskbar, Start Menu, and App list.
+- **Automated Windows SDK MakePri & MakeAppx Pipeline**: Added `build-msix.ps1` to automatically compile `resources.pri` asset index and pack Store-ready `.msix` packages.
+- **Unified Release Script**: Added `-MSIX` flag to `build-release.ps1` (`.\build-release.ps1 -Installer -MSIX`) for building Portable EXE, Inno Setup Installer, and MSIX package in one command.
+- **MSIX Packaging Documentation**: Added comprehensive packaging and Microsoft Store Partner Center submission guide in `docs/MSIX_PACKAGING.md`.
+
 ## [2.0.1] - 2026-08-08
 
 ### Added
