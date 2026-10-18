@@ -39,6 +39,7 @@ config.json
 *.log
 *.log.*
 *.tmp
+*.zip
 
 # OS
 Thumbs.db
