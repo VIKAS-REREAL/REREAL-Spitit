@@ -10,10 +10,10 @@ When you build the application, output files are placed in dedicated `dist` dire
 
 | Package Type | File Path | Build Command | Description |
 | :--- | :--- | :--- | :--- |
-| **MSIX Package** | `dist_msix\REREAL-Spitit-2.0.2.msix` | `.\build-msix.ps1` | Official Microsoft Store / Sideloading MSIX package |
+| **MSIX Package** | `dist_msix\REREAL-Spitit-2.0.3.msix` | `.\build-msix.ps1` | Official Microsoft Store / Sideloading MSIX package |
 | **MSIX Layout** | `dist_msix\layout\` | `.\build-msix.ps1` | Raw unpacked MSIX directory containing `REREAL-Spitit.exe`, `AppxManifest.xml`, and `Assets\` |
 | **Portable Executable** | `dist\REREAL-Spitit.exe` | `.\build-release.ps1` | Single standalone `.exe` (no installation required) |
-| **Inno Setup Installer** | `dist_installer\REREAL-Spitit-Setup-2.0.2.exe` | `.\build-release.ps1 -Installer` | Traditional Windows installer wizard |
+| **Inno Setup Installer** | `dist_installer\REREAL-Spitit-Setup-2.0.3.exe` | `.\build-release.ps1 -Installer` | Traditional Windows installer wizard |
 
 ---
 
@@ -45,7 +45,7 @@ To build the Portable EXE, Inno Setup Installer, and MSIX Package all in a singl
    ```
 2. **Windows SDK (`MakeAppx.exe` and `MakePri.exe`)**:
    - `MakeAppx.exe` and `MakePri.exe` are part of the free **Windows SDK**.
-   - `build-msix.ps1` automatically detects them, generates `resources.pri` with modern unplated taskbar/start menu assets, and packs `dist_msix\REREAL-Spitit-2.0.2.msix`.
+   - `build-msix.ps1` automatically detects them, generates `resources.pri` with modern unplated taskbar/start menu assets, and packs `dist_msix\REREAL-Spitit-2.0.3.msix`.
    - Install the Windows SDK via `winget`:
      ```powershell
      winget install Microsoft.WindowsSDK.10.0.18362
@@ -83,8 +83,8 @@ For store submission:
    <Identity
      Name="YOUR-PARTNER-CENTER-APP-ID"
      Publisher="CN=YOUR-PUBLISHER-ID"
-     Version="2.0.2.0"
+     Version="2.0.3.0"
      ProcessorArchitecture="x64" />
    ```
 4. Run `.\build-msix.ps1` to produce the `.msix` package.
-5. Upload `dist_msix\REREAL-Spitit-2.0.2.msix` directly to Partner Center. Microsoft Store automatically signs the package upon approval.
+5. Upload `dist_msix\REREAL-Spitit-2.0.3.msix` directly to Partner Center. Microsoft Store automatically signs the package upon approval.

@@ -29,9 +29,7 @@ def paste_text(text: str, cfg: dict) -> None:
     # 2. Auto-paste
     if cfg.get("output_paste", True):
         try:
-            time.sleep(0.05)  # Small delay for clipboard to settle
-            import keyboard
-            keyboard.press_and_release("ctrl+v")
+            _release_modifiers_and_paste()
         except Exception as e:
             print(f"[Paster] Auto-paste failed: {e}")
 
@@ -43,6 +41,44 @@ def paste_text(text: str, cfg: dict) -> None:
     # 4. Sound
     if cfg.get("output_sound", True):
         _play_done_sound()
+
+
+def _release_modifiers_and_paste() -> None:
+    """
+    Release any stuck physical modifier keys (Alt, Shift, Win) and simulate Ctrl+V.
+    Prevents Alt+V (which opens Notepad's 'View' menu instead of pasting).
+    """
+    import time
+    try:
+        import ctypes
+        user32 = ctypes.windll.user32
+        VK_SHIFT = 0x10
+        VK_CONTROL = 0x11
+        VK_MENU = 0x12  # Alt
+        VK_LWIN = 0x5B
+        VK_RWIN = 0x5C
+        VK_V = 0x56
+        KEYEVENTF_KEYUP = 0x0002
+
+        # Give target app a moment to receive clipboard
+        time.sleep(0.06)
+
+        # Release any modifier keys that might still be logically down from hotkey combo
+        for vk in (VK_MENU, VK_SHIFT, VK_LWIN, VK_RWIN):
+            user32.keybd_event(vk, 0, KEYEVENTF_KEYUP, 0)
+
+        time.sleep(0.02)
+
+        # Send Ctrl+V
+        user32.keybd_event(VK_CONTROL, 0, 0, 0)
+        user32.keybd_event(VK_V, 0, 0, 0)
+        time.sleep(0.03)
+        user32.keybd_event(VK_V, 0, KEYEVENTF_KEYUP, 0)
+        user32.keybd_event(VK_CONTROL, 0, KEYEVENTF_KEYUP, 0)
+    except Exception:
+        import keyboard
+        time.sleep(0.05)
+        keyboard.press_and_release("ctrl+v")
 
 
 def _show_toast(message: str) -> None:

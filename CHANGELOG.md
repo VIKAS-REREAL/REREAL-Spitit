@@ -5,6 +5,20 @@ All notable changes to REREAL - Spitit will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.3] - 2026-10-21
+
+### Fixed
+- **Policy 10.1.2.10 Functionality (No Output on Surface Laptops)**: Fixed false-positive silence detection rejection where default `silence_threshold = 0.01` with whole-buffer averaging dropped valid speech on laptops with low-gain microphones (such as Surface Laptop 5).
+- **Windowed Peak RMS Silence Detection**: Replaced whole-buffer RMS calculation with 100ms windowed peak RMS, ensuring speech surrounded by pauses is never dropped.
+- **Graceful Silence / Empty Handling**: Muted microphones or silent recordings no longer trigger an error cross (`X`) on the floating status pill; the pill now gently dismisses without flashing an error.
+- **Transcriber Empty Text Handling**: If speech-to-text returns empty text, the app no longer raises an unhandled exception or enters error state.
+- **Reliable Win32 Auto-Paste**: Replaced basic `keyboard.press_and_release("ctrl+v")` with Win32 `keybd_event` that explicitly releases modifier keys (`Alt`, `Shift`, `Win`) before sending `Ctrl+V`, preventing modifier collision (e.g. `Alt+V` opening Notepad's View menu).
+- **Audio Device Fallback**: Automatically falls back to the System Default input device if a configured microphone index fails to open.
+- **CJK / International Character Count**: Correctly counts characters for Chinese, Japanese, and Korean transcriptions in the status pill.
+
+### Added
+- **GitHub Actions Release CI/CD**: Added `.github/workflows/build.yml` to automatically compile `REREAL-Spitit.exe` (Portable), `REREAL-Spitit-Setup-2.0.3.exe` (Inno Setup), and `REREAL-Spitit-2.0.3.msix` (Microsoft Store MSIX) on Windows runners and publish to GitHub Releases & Workflow Artifacts.
+
 ## [2.0.2] - 2026-09-16
 
 ### Fixed

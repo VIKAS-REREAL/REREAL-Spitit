@@ -14,7 +14,7 @@ from datetime import datetime
 
 APP_NAME = "REREAL_Spitit"
 CONFIG_FILENAME = "config.json"
-VERSION = "2.0.2"
+VERSION = "2.0.3"
 MAX_HISTORY = 50
 
 DEFAULTS = {
@@ -26,7 +26,7 @@ DEFAULTS = {
     "launch_on_startup": False,
     "pill_position": None,
     "mic_device_index": None,
-    "silence_threshold": 0.01,
+    "silence_threshold": 0.0015,
     "output_paste": True,
     "output_clipboard": True,
     "output_notification": True,
@@ -133,6 +133,10 @@ def load_config() -> dict:
 
     # Migrate: ensure version is current
     config["version"] = VERSION
+
+    # Migrate: if silence_threshold is from older high default (>= 0.01), lower to sensitive 0.0015
+    if config.get("silence_threshold", 0.01) >= 0.009:
+        config["silence_threshold"] = 0.0015
 
     # Validate history
     if not isinstance(config.get("history"), list):

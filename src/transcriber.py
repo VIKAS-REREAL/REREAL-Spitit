@@ -133,7 +133,7 @@ def transcribe(wav_bytes: bytes, api_key: str, language: str = "en") -> str:
     raw_text = str(transcription).strip()
 
     if not raw_text:
-        raise ValueError("Transcription returned empty text.")
+        return ""
 
     # Hinglish post-processing: pass through LLM for cleanup
     if language == "hinglish":

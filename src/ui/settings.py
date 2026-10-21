@@ -146,7 +146,7 @@ class SettingsWindow:
             "output_notification": ctk.BooleanVar(value=cfg.get("output_notification", True)),
             "output_sound": ctk.BooleanVar(value=cfg.get("output_sound", True)),
             "history_enabled": ctk.BooleanVar(value=cfg.get("history_enabled", True)),
-            "silence_threshold": ctk.DoubleVar(value=cfg.get("silence_threshold", 0.01)),
+            "silence_threshold": ctk.DoubleVar(value=cfg.get("silence_threshold", 0.0015)),
             "launch_on_startup": ctk.BooleanVar(value=cfg.get("launch_on_startup", False)),
         }
         self._is_dirty = False

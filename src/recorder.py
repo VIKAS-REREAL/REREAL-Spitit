@@ -84,6 +84,24 @@ class Recorder:
             )
             self._stream.start()
         except Exception as e:
+            if self._device_index is not None:
+                # Fallback to system default device (index None)
+                print(f"[Recorder] Device {self._device_index} failed ({e}), falling back to default device.")
+                try:
+                    self._device_index = None
+                    self._stream = sd.InputStream(
+                        samplerate=self.SAMPLE_RATE,
+                        channels=self.CHANNELS,
+                        dtype="float32",
+                        blocksize=self.CHUNK_SIZE,
+                        device=None,
+                        callback=callback,
+                    )
+                    self._stream.start()
+                    return
+                except Exception as fallback_err:
+                    self._recording = False
+                    raise RuntimeError(f"Failed to start recording on default device: {fallback_err}") from fallback_err
             self._recording = False
             raise RuntimeError(f"Failed to start recording: {e}") from e
 
@@ -142,21 +160,41 @@ class Recorder:
                 pass
             self._stream = None
 
-    def check_silence(self, wav_bytes: bytes, threshold: float = 0.01) -> bool:
+    def check_silence(self, wav_bytes: bytes, threshold: float = 0.001) -> bool:
         """
         Check if WAV audio is below the silence threshold.
-        Returns True if the audio is silence (too quiet).
+        Evaluates peak window RMS across 100ms chunks so natural pauses
+        between words or before/after speaking do not cause false positives.
+        Returns True if the audio is completely silent / dead microphone.
         """
         import numpy as np
 
-        # Read the WAV data back to get raw samples
-        wav_buffer = io.BytesIO(wav_bytes)
-        with wave.open(wav_buffer, "rb") as wf:
-            raw = wf.readframes(wf.getnframes())
-            audio = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32767.0
+        try:
+            wav_buffer = io.BytesIO(wav_bytes)
+            with wave.open(wav_buffer, "rb") as wf:
+                raw = wf.readframes(wf.getnframes())
+                if not raw:
+                    return True
+                audio = np.frombuffer(raw, dtype=np.int16).astype(np.float32) / 32767.0
 
-        rms = float(np.sqrt(np.mean(audio ** 2)))
-        return rms < threshold
+            if len(audio) == 0:
+                return True
+
+            # Use 100ms windows (1600 samples at 16kHz)
+            window_size = int(self.SAMPLE_RATE * 0.1)
+            if len(audio) < window_size:
+                rms = float(np.sqrt(np.mean(audio ** 2)))
+                return rms < threshold
+
+            num_windows = len(audio) // window_size
+            chunks = audio[:num_windows * window_size].reshape(num_windows, window_size)
+            window_rms = np.sqrt(np.mean(chunks ** 2, axis=1))
+            peak_rms = float(np.max(window_rms))
+
+            return peak_rms < threshold
+        except Exception as e:
+            print(f"[Recorder] check_silence error: {e}")
+            return False
 
     @staticmethod
     def list_devices() -> list:

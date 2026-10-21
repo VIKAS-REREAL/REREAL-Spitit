@@ -123,14 +123,15 @@ class StatusPill:
         y = self._win.winfo_y()
         self._config["pill_position"] = [x, y]
 
-    def set_state(self, state: str, word_count: int = 0, duration: float = 0.0):
+    def set_state(self, state: str, word_count: int = 0, duration: float = 0.0, unit: str = "words"):
         """
         Change the pill state.
         
         Args:
             state: One of 'hidden', 'recording', 'transcribing', 'done', 'error'
-            word_count: Number of words (shown in done state)
+            word_count: Number of words or characters (shown in done state)
             duration: Current recording duration in seconds
+            unit: 'words' or 'chars'
         """
         # Cancel pending operations
         if self._tick_id:
@@ -160,9 +161,9 @@ class StatusPill:
             self._tick_animate()
         elif state == "done":
             self._draw_done()
-            # Show word count
+            # Show word or character count
             if word_count > 0:
-                self._word_label.configure(text=f"{word_count} words")
+                self._word_label.configure(text=f"{word_count} {unit}")
                 self._word_label.pack(pady=(0, 2))
             # Auto-hide after 900ms
             self._hide_id = self._root.after(900, lambda: self.set_state("hidden"))

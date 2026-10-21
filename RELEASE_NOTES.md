@@ -1,3 +1,40 @@
+# REREAL - Spitit v2.0.3 — Certification Fixes & GitHub Actions Release CI/CD
+ 
+🚀 **REREAL - Spitit v2.0.3** resolves Microsoft Store certification rejection issues (Policy 10.1.2.10 Functionality on Surface devices and Policy 11.16 Generative AI declaration guidance), introduces resilient windowed peak-RMS silence detection, clean modifier-free auto-pasting, and automated GitHub Actions release builds for Portable, Setup, and Store MSIX packages.
+
+---
+
+## 🌟 What's New in v2.0.3
+
+### 🎤 Robust Dictation on Surface Laptops & All Microphones (Policy 10.1.2.10)
+- **Resolved False-Positive Silence Rejections**: Surface Laptop 5 and modern ultrabooks utilize studio array microphones with lower digital gain margins. The previous hardcoded `silence_threshold = 0.01` with whole-buffer averaging caused valid speech to be dropped and displayed an error cross (`X`).
+- **Windowed Peak RMS**: Speech detection now evaluates audio across 100ms windows, ensuring that pauses before or after speaking never dilute speech audio.
+- **Graceful Error Recovery**: Muted microphones or silent inputs now gently hide the status pill rather than flashing an error state. Empty transcriptions no longer throw unhandled exceptions.
+- **Audio Device Fallback**: Automatically falls back to the system default input device if a configured microphone index fails.
+
+### 📋 Modifier-Clean Win32 Auto-Paste
+- **Notepad Menu Collision Fix**: Replaced basic `keyboard.press_and_release("ctrl+v")` with a Win32 `keybd_event` sequence that releases any active modifier keys (`Alt`, `Shift`, `Win`) before simulating `Ctrl+V`. This prevents `Alt+V` from inadvertently opening Notepad's "View" menu instead of pasting text.
+- **CJK Unicode Character Count**: Word/character counters in the floating pill and history accurately display character counts for Chinese, Japanese, and Korean.
+
+### ⚙️ Automated GitHub Actions CI/CD Pipeline
+- **One-Click Release Automation**: Added `.github/workflows/build.yml` which automatically builds and releases all 3 target artifacts on `windows-latest`:
+  1. `REREAL-Spitit.exe` (Portable executable)
+  2. `REREAL-Spitit-Setup-2.0.3.exe` (Inno Setup Installer)
+  3. `REREAL-Spitit-2.0.3.msix` (Microsoft Store MSIX Package)
+- **Artifacts Available Directly**: Every push and manual workflow trigger produces the ready-to-upload MSIX and installable executables under GitHub Actions run artifacts and GitHub Releases.
+
+---
+
+## 📥 Downloads & Assets (v2.0.3)
+
+| File Name | Description | Size | Status |
+|-----------|-------------|------|--------|
+| `REREAL-Spitit-Setup-2.0.3.exe` | **Windows Installer** (Recommended) — Setup wizard with desktop & start shortcuts | ~70 MB | Verified |
+| `REREAL-Spitit.exe` | **Portable Executable** — Single `.exe`, no installation required | ~69 MB | Verified |
+| `REREAL-Spitit-2.0.3.msix` | **MSIX Package** — Microsoft Store & modern Windows 10/11 package | ~79 MB | Store Ready |
+
+---
+
 # REREAL - Spitit v2.0.2 — Launch Stability & Microsoft Store MSIX Packaging
 
 🚀 **REREAL - Spitit v2.0.2** brings full Microsoft Store MSIX packaging support, crash-proof launch initialization under Windows 11 containers, modern borderless unplated taskbar/start menu icons, and unified release automation.

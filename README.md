@@ -40,9 +40,9 @@
 
 | Type | Description | Link |
 |------|-------------|------|
-| **Installer** (recommended) | Full setup wizard with shortcuts | [Download v2.0.2](https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/download/latest/REREAL-Spitit-Setup-2.0.2.exe) |
-| **Portable** | Single .exe, no install needed | [Download v2.0.2 (Portable)](https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/download/latest/REREAL-Spitit.exe) |
-| **MSIX Package** | Microsoft Store & Windows 10/11 sideload | [Download v2.0.2 (MSIX)](https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/download/latest/REREAL-Spitit-2.0.2.msix) |
+| **Installer** (recommended) | Full setup wizard with shortcuts | [Download v2.0.3](https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/download/latest/REREAL-Spitit-Setup-2.0.3.exe) |
+| **Portable** | Single .exe, no install needed | [Download v2.0.3 (Portable)](https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/download/latest/REREAL-Spitit.exe) |
+| **MSIX Package** | Microsoft Store & Windows 10/11 sideload | [Download v2.0.3 (MSIX)](https://github.com/VIKAS-REREAL/REREAL-Spitit/releases/download/latest/REREAL-Spitit-2.0.3.msix) |
 
 **System Requirements:** Windows 10/11 (64-bit), ~50MB disk, internet for transcription, a microphone.
 

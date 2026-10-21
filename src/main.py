@@ -252,11 +252,12 @@ class VoiceFlowApp:
                 self._pill.set_state("hidden")
             return
 
-        # Check silence
-        threshold = self._config.get("silence_threshold", 0.01)
+        # Check silence (dead microphone or extreme quietness)
+        threshold = self._config.get("silence_threshold", 0.0015)
         if self._recorder.check_silence(wav_bytes, threshold):
+            print("[Main] Recording was silence, hiding pill.")
             if self._pill:
-                self._pill.set_state("error")
+                self._pill.set_state("hidden")
             return
 
         # Transcribe in background
@@ -303,6 +304,12 @@ class VoiceFlowApp:
                 language=self._config.get("language", "en"),
             )
 
+            if not text:
+                # No speech detected — gently hide pill, do not error
+                print("[Main] No speech detected in transcription.")
+                self._root.after(0, lambda: self._pill.set_state("hidden") if self._pill else None)
+                return
+
             self._root.after(0, lambda: self._on_transcription_done(text))
 
         except Exception as e:
@@ -311,7 +318,8 @@ class VoiceFlowApp:
 
     def _on_transcription_done(self, text: str):
         """Handle successful transcription (on main thread)."""
-        word_count = len(text.split())
+        is_cjk = any('\u4e00' <= char <= '\u9fff' or '\u3040' <= char <= '\u30ff' for char in text)
+        word_count = len(text) if is_cjk else len(text.split())
         self._last_text = text
 
         # Update tray
@@ -327,7 +335,11 @@ class VoiceFlowApp:
 
         # Show done state with word count
         if self._pill:
-            self._pill.set_state("done", word_count=word_count)
+            self._pill.set_state(
+                "done",
+                word_count=word_count,
+                unit="chars" if is_cjk else "words"
+            )
 
         # Paste/clipboard/notification/sound
         from src.paster import paste_text

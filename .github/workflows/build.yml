@@ -1,0 +1,91 @@
+name: Build & Release
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Spitit (Portable, Setup, MSIX)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install "pyinstaller>=6.0" Pillow
+
+      - name: Install Inno Setup
+        run: |
+          choco install innosetup -y
+
+      - name: Build All Targets (Portable, Installer, MSIX)
+        shell: powershell
+        run: |
+          # Add Inno Setup 6 to PATH
+          $env:PATH += ";C:\Program Files (x86)\Inno Setup 6"
+          
+          # Run unified build script for Portable EXE, Setup Installer, and MSIX package
+          .\build-release.ps1 -Installer -MSIX
+
+      - name: Locate Build Artifacts
+        shell: powershell
+        id: locate_artifacts
+        run: |
+          $portable = Get-Item "dist\REREAL-Spitit.exe"
+          $setup = Get-ChildItem "dist_installer" -Filter "REREAL-Spitit-Setup-*.exe" | Select-Object -First 1
+          $msix = Get-ChildItem "dist_msix" -Filter "REREAL-Spitit-*.msix" | Select-Object -First 1
+
+          if (-not $portable) { throw "Portable executable not found in dist!" }
+          if (-not $setup) { throw "Setup installer not found in dist_installer!" }
+          if (-not $msix) { throw "MSIX package not found in dist_msix!" }
+
+          Write-Host "Found Portable: $($portable.FullName)"
+          Write-Host "Found Setup: $($setup.FullName)"
+          Write-Host "Found MSIX: $($msix.FullName)"
+
+          echo "PORTABLE_PATH=$($portable.FullName)" >> $env:GITHUB_OUTPUT
+          echo "SETUP_PATH=$($setup.FullName)" >> $env:GITHUB_OUTPUT
+          echo "MSIX_PATH=$($msix.FullName)" >> $env:GITHUB_OUTPUT
+
+      - name: Upload Artifacts to GitHub Actions
+        uses: actions/upload-artifact@v4
+        with:
+          name: REREAL-Spitit-v2.0.3-Windows
+          path: |
+            ${{ steps.locate_artifacts.outputs.PORTABLE_PATH }}
+            ${{ steps.locate_artifacts.outputs.SETUP_PATH }}
+            ${{ steps.locate_artifacts.outputs.MSIX_PATH }}
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ steps.locate_artifacts.outputs.PORTABLE_PATH }}
+            ${{ steps.locate_artifacts.outputs.SETUP_PATH }}
+            ${{ steps.locate_artifacts.outputs.MSIX_PATH }}
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || 'latest' }}
+          name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || 'REREAL - Spitit v2.0.3' }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

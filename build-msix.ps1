@@ -25,7 +25,7 @@ if (Test-Path $manifestPath) {
         $Publisher = $manifestXml.Package.Identity.Publisher
     }
 } else {
-    $version = "2.0.2"
+    $version = "2.0.3"
     if (-not $Publisher) { $Publisher = "CN=REREAL" }
 }
 
